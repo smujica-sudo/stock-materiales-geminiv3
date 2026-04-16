@@ -201,26 +201,31 @@
         
         <!-- Tab 1: Inicio -->
         <section id="tab-home" class="w-full h-full flex flex-col py-2 transition-transform max-w-6xl mx-auto">
-          <div class="bg-m3-surfaceContainerLow rounded-3xl p-5 md:p-8 mb-6 border-t-4 border-m3-primary shadow-sm md:flex md:items-center md:justify-between">
-            <div class="md:w-1/2">
-              <div class="flex items-center justify-between md:justify-start md:gap-4 mb-4">
-                <span class="text-xs font-medium text-m3-onSurfaceVariant uppercase tracking-wider">Stock Global</span>
-                <span id="home-user" class="inline-flex items-center gap-1 bg-m3-surfaceContainerHigh px-2 py-1 rounded-full text-xs font-medium"><span class="material-symbols-rounded text-[14px]">person</span>Usuario</span>
-              </div>
-              <div id="home-total-stock" class="text-5xl md:text-7xl font-light text-m3-onSurface font-mono tracking-tight mb-4 md:mb-0">0</div>
+          
+          <div class="flex items-center justify-between mb-4 px-1 mt-2">
+            <span class="text-xs md:text-sm font-medium text-m3-onSurfaceVariant tracking-wider uppercase">Resumen</span>
+            <span id="home-user" class="inline-flex items-center gap-1 bg-m3-surfaceContainerHigh px-3 py-1.5 rounded-full text-xs font-medium text-m3-onSurface"><span class="material-symbols-rounded text-[16px]">person</span>Usuario</span>
+          </div>
+          
+          <div class="grid grid-cols-2 md:grid-cols-4 gap-3 md:gap-4 mb-8">
+            <div onclick="app.switchTab('home')" class="bg-m3-surfaceContainerLow border-t-4 border-m3-success p-4 md:p-5 rounded-2xl md:rounded-3xl cursor-pointer active:scale-95 hover:bg-m3-surfaceContainerHigh transition-all shadow-sm">
+              <div class="flex justify-between items-center mb-2"><span class="text-[11px] md:text-xs text-m3-onSurfaceVariant uppercase font-medium">Óptimos</span><span class="material-symbols-rounded text-[18px] text-m3-success">check_circle</span></div>
+              <div id="home-kpi-ok" class="text-3xl md:text-4xl font-medium text-m3-success font-mono tracking-tight">0</div>
             </div>
-            <div class="grid grid-cols-3 gap-3 md:gap-6 md:w-1/2">
-              <div onclick="app.switchTab('home')" class="bg-m3-surfaceContainer px-3 py-2 md:p-4 rounded-2xl md:rounded-3xl cursor-pointer active:scale-95 hover:bg-m3-surfaceContainerHigh transition-all">
-                <div id="home-kpi-ok" class="text-xl md:text-3xl font-medium text-m3-success font-mono">0</div><div class="text-[10px] md:text-xs text-m3-onSurfaceVariant uppercase mt-1">Óptimos</div>
-              </div>
-              <div onclick="app.switchTab('alerts')" class="bg-m3-surfaceContainer px-3 py-2 md:p-4 rounded-2xl md:rounded-3xl cursor-pointer active:scale-95 hover:bg-m3-surfaceContainerHigh transition-all">
-                <div id="home-kpi-low" class="text-xl md:text-3xl font-medium text-m3-warning font-mono">0</div><div class="text-[10px] md:text-xs text-m3-onSurfaceVariant uppercase mt-1">Bajos</div>
-              </div>
-              <div onclick="app.switchTab('alerts')" class="bg-m3-surfaceContainer px-3 py-2 md:p-4 rounded-2xl md:rounded-3xl cursor-pointer active:scale-95 hover:bg-m3-surfaceContainerHigh transition-all">
-                <div id="home-kpi-crit" class="text-xl md:text-3xl font-medium text-m3-error font-mono">0</div><div class="text-[10px] md:text-xs text-m3-onSurfaceVariant uppercase mt-1">Críticos</div>
-              </div>
+            <div onclick="app.switchTab('alerts')" class="bg-m3-surfaceContainerLow border-t-4 border-m3-warning p-4 md:p-5 rounded-2xl md:rounded-3xl cursor-pointer active:scale-95 hover:bg-m3-surfaceContainerHigh transition-all shadow-sm">
+              <div class="flex justify-between items-center mb-2"><span class="text-[11px] md:text-xs text-m3-onSurfaceVariant uppercase font-medium">Bajos</span><span class="material-symbols-rounded text-[18px] text-m3-warning">info</span></div>
+              <div id="home-kpi-low" class="text-3xl md:text-4xl font-medium text-m3-warning font-mono tracking-tight">0</div>
+            </div>
+            <div onclick="app.switchTab('alerts')" class="bg-m3-surfaceContainerLow border-t-4 border-orange-500 p-4 md:p-5 rounded-2xl md:rounded-3xl cursor-pointer active:scale-95 hover:bg-m3-surfaceContainerHigh transition-all shadow-sm">
+              <div class="flex justify-between items-center mb-2"><span class="text-[11px] md:text-xs text-m3-onSurfaceVariant uppercase font-medium">Críticos</span><span class="material-symbols-rounded text-[18px] text-orange-500">warning</span></div>
+              <div id="home-kpi-crit" class="text-3xl md:text-4xl font-medium text-orange-500 font-mono tracking-tight">0</div>
+            </div>
+            <div onclick="app.switchTab('alerts')" class="bg-m3-surfaceContainerLow border-t-4 border-m3-error p-4 md:p-5 rounded-2xl md:rounded-3xl cursor-pointer active:scale-95 hover:bg-m3-surfaceContainerHigh transition-all shadow-sm">
+              <div class="flex justify-between items-center mb-2"><span class="text-[11px] md:text-xs text-m3-onSurfaceVariant uppercase font-medium">Agotados</span><span class="material-symbols-rounded text-[18px] text-m3-error">error</span></div>
+              <div id="home-kpi-zero" class="text-3xl md:text-4xl font-medium text-m3-error font-mono tracking-tight">0</div>
             </div>
           </div>
+          
           <div class="text-sm font-medium text-m3-onSurfaceVariant tracking-wider uppercase mb-3 px-1">Categorías</div>
           <div id="home-categories" class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3 md:gap-4"></div>
         </section>
@@ -395,7 +400,9 @@
     const FALLBACK_ITEMS = [{"id":"e1","cat":"Etiquetas Adhesivas","subcat":"1Kg Funsmart","name":"Espresso Original","stock":600,"min":100,"unit":"uds","alert":""},{"id":"e2","cat":"Etiquetas Adhesivas","subcat":"1Kg Funsmart","name":"Espresso Frutal","stock":142,"min":150,"unit":"uds","alert":"Pedir pronto"},{"id":"b1","cat":"Bolsas","subcat":"MTPACK Impresas","name":"MTPACK Impresas 250g","stock":75,"min":500,"unit":"uds","alert":""},{"id":"c1","cat":"Cajas","subcat":"Kawas Grandes","name":"Caja Kawas SYT 12KG","stock":1850,"min":500,"unit":"uds","alert":""}];
     const CC_KNOWN = {
       "Etiquetas Adhesivas": {i:'label',c:'text-[#0061A4]',b:'bg-[#0061A4]/10'},
+      "Bolsas de café": {i:'shopping_bag',c:'text-[#146C2E]',b:'bg-[#146C2E]/10'},
       "Bolsas": {i:'shopping_bag',c:'text-[#146C2E]',b:'bg-[#146C2E]/10'},
+      "Cajas de cartón": {i:'inventory_2',c:'text-[#BA1A1A]',b:'bg-[#BA1A1A]/10'},
       "Cajas": {i:'inventory_2',c:'text-[#BA1A1A]',b:'bg-[#BA1A1A]/10'},
       "Empaque y Despacho": {i:'package_2',c:'text-[#825500]',b:'bg-[#825500]/10'},
       "Cold Brew": {i:'coffee',c:'text-[#0061A4]',b:'bg-[#0061A4]/10'},
@@ -604,7 +611,14 @@
         if(tId === 'search') setTimeout(() => document.getElementById('inp-search').focus(), 100);
       },
 
-      getCatUI(cat) { return CC_KNOWN[cat] || {i:'category', c:'text-m3-primary', b:'bg-m3-primaryContainer'}; },
+      getCatUI(cat) { 
+        if (CC_KNOWN[cat]) return CC_KNOWN[cat];
+        // Si no hay match exacto, buscamos por la primera palabra (ej: "Bolsas" en "Bolsas de café")
+        const firstWord = cat.split(" ")[0];
+        if (CC_KNOWN[firstWord]) return CC_KNOWN[firstWord];
+        
+        return {i:'category', c:'text-m3-primary', b:'bg-m3-primaryContainer'}; 
+      },
       
       createListItem(it, idx, isGrid = false) {
         const ui = STC[st(it)];
@@ -656,20 +670,22 @@
       },
 
       renderHome() {
-        const cats = {}; let tStock = 0; let kOk = 0; let kLow = 0; let kCrit = 0;
+        const cats = {}; let kOk = 0; let kLow = 0; let kCrit = 0; let kZero = 0;
         this.state.items.forEach(it => {
           if(!cats[it.cat]) cats[it.cat] = { count: 0, issues: 0 };
           cats[it.cat].count++;
-          tStock += it.stock;
           const s = st(it);
-          if(['zero', 'crit'].includes(s)) { cats[it.cat].issues++; kCrit++; }
-          else if(s === 'low') kLow++; else kOk++;
+          if(['zero', 'crit'].includes(s)) cats[it.cat].issues++;
+          if(s === 'zero') kZero++;
+          else if(s === 'crit') kCrit++;
+          else if(s === 'low') kLow++; 
+          else kOk++;
         });
 
-        document.getElementById('home-total-stock').textContent = tStock.toLocaleString();
         document.getElementById('home-kpi-ok').textContent = kOk;
         document.getElementById('home-kpi-low').textContent = kLow;
         document.getElementById('home-kpi-crit').textContent = kCrit;
+        document.getElementById('home-kpi-zero').textContent = kZero;
 
         const html = Object.keys(cats).map((cat, i) => {
           const ui = this.getCatUI(cat); const c = cats[cat];
