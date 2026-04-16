@@ -1,423 +1,386 @@
 <!DOCTYPE html>
-<html lang="es" class="light">
+<html lang="es">
 <head>
   <base target="_top">
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
   <meta name="apple-mobile-web-app-capable" content="yes">
-  <meta name="apple-mobile-web-app-status-bar-style" content="default">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="theme-color" content="#FAF9FD">
   <title>Kawas Stock Pro</title>
 
-  <!-- Fuente Inter (Estándar de shadcn/ui) -->
+  <!-- Preconnect para priorizar la descarga de la fuente -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-
-  <!-- Lucide Icons (CDN) -->
-  <script src="https://unpkg.com/lucide@latest"></script>
+  
+  <!-- Google Fonts & Material Symbols (display=block evita el pestañeo inicial) -->
+  <link href="https://fonts.googleapis.com/css2?family=Google+Sans:wght@400;500;700&family=Roboto:wght@400;500;700&family=Roboto+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@24,400,0..1,0&display=block" rel="stylesheet" />
 
   <!-- Tailwind CSS -->
   <script src="https://cdn.tailwindcss.com"></script>
   
-  <!-- Configuración shadcn/ui (Variables CSS + Tailwind) -->
+  <!-- Configuración M3 Premium -->
   <script>
     tailwind.config = {
-      darkMode: ["class"],
       theme: {
         extend: {
-          fontFamily: { sans: ['Inter', 'sans-serif'] },
-          colors: {
-            border: "hsl(var(--border))",
-            input: "hsl(var(--input))",
-            ring: "hsl(var(--ring))",
-            background: "hsl(var(--background))",
-            foreground: "hsl(var(--foreground))",
-            primary: { DEFAULT: "hsl(var(--primary))", foreground: "hsl(var(--primary-foreground))" },
-            secondary: { DEFAULT: "hsl(var(--secondary))", foreground: "hsl(var(--secondary-foreground))" },
-            destructive: { DEFAULT: "hsl(var(--destructive))", foreground: "hsl(var(--destructive-foreground))" },
-            muted: { DEFAULT: "hsl(var(--muted))", foreground: "hsl(var(--muted-foreground))" },
-            accent: { DEFAULT: "hsl(var(--accent))", foreground: "hsl(var(--accent-foreground))" },
-            card: { DEFAULT: "hsl(var(--card))", foreground: "hsl(var(--card-foreground))" },
+          fontFamily: { 
+            sans: ['Roboto', 'sans-serif'], 
+            display: ['Google Sans', 'sans-serif'],
+            mono: ['Roboto Mono', 'monospace'] 
           },
-          borderRadius: { lg: "var(--radius)", md: "calc(var(--radius) - 2px)", sm: "calc(var(--radius) - 4px)" },
-          boxShadow: { 'shad': '0 1px 2px 0 rgba(0,0,0,0.05)' }
+          colors: {
+            m3: {
+              primary: '#0061A4',
+              onPrimary: '#FFFFFF',
+              primaryContainer: '#D1E4FF',
+              onPrimaryContainer: '#001D36',
+              secondary: '#535F70',
+              onSecondary: '#FFFFFF',
+              secondaryContainer: '#D7E3F7',
+              onSecondaryContainer: '#101C2B',
+              surface: '#FAF9FD',
+              onSurface: '#1A1C1E',
+              surfaceVariant: '#E2E2E5',
+              onSurfaceVariant: '#43474E',
+              surfaceContainerLow: '#F4F3F7',
+              surfaceContainer: '#EEEDF1',
+              surfaceContainerHigh: '#E8E7EB',
+              surfaceContainerHighest: '#E2E2E5',
+              outline: '#73777F',
+              error: '#BA1A1A',
+              errorContainer: '#FFDAD6',
+              onErrorContainer: '#410002',
+              success: '#146C2E',
+              successContainer: '#A8F0B3',
+              onSuccessContainer: '#002106',
+              warning: '#825500',
+              warningContainer: '#FFDDAE',
+              onWarningContainer: '#2A1800',
+            }
+          },
+          boxShadow: { 'm3-1': '0 1px 2px 0 rgba(0,0,0,0.3), 0 1px 3px 1px rgba(0,0,0,0.15)' }
         }
       }
     }
   </script>
 
+  <!-- INYECCIÓN TAILWIND: Evita que el CDN destruya los estilos asíncronamente -->
   <style type="text/tailwindcss">
     @layer base {
-      :root {
-        --background: 0 0% 100%;
-        --foreground: 240 10% 3.9%;
-        --card: 0 0% 100%;
-        --card-foreground: 240 10% 3.9%;
-        --popover: 0 0% 100%;
-        --popover-foreground: 240 10% 3.9%;
-        --primary: 240 5.9% 10%;
-        --primary-foreground: 0 0% 98%;
-        --secondary: 240 4.8% 95.9%;
-        --secondary-foreground: 240 5.9% 10%;
-        --muted: 240 4.8% 95.9%;
-        --muted-foreground: 240 3.8% 46.1%;
-        --accent: 240 4.8% 95.9%;
-        --accent-foreground: 240 5.9% 10%;
-        --destructive: 0 84.2% 60.2%;
-        --destructive-foreground: 0 0% 98%;
-        --border: 240 5.9% 90%;
-        --input: 240 5.9% 90%;
-        --ring: 240 5.9% 10%;
-        --radius: 0.75rem;
-      }
-
-      * { @apply border-border; }
-      body { @apply bg-background text-foreground antialiased h-screen overflow-hidden overscroll-none; -webkit-tap-highlight-color: transparent; }
+      html, body { height: 100%; overflow: hidden; overscroll-behavior-y: none; -webkit-tap-highlight-color: transparent; }
       input[type=number]::-webkit-inner-spin-button { -webkit-appearance: none; }
       .no-scrollbar::-webkit-scrollbar { display: none; }
       .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
     }
-
+    
     @layer components {
-      /* shadcn primitives */
-      .card { @apply rounded-xl border bg-card text-card-foreground shadow-shad; }
-      .btn { @apply inline-flex items-center justify-center rounded-md text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50 h-10 px-4 py-2 active:scale-[0.98]; }
-      .btn-primary { @apply bg-primary text-primary-foreground hover:bg-primary/90; }
-      .btn-secondary { @apply bg-secondary text-secondary-foreground hover:bg-secondary/80; }
-      .btn-outline { @apply border border-input bg-background hover:bg-accent hover:text-accent-foreground; }
-      .btn-ghost { @apply hover:bg-accent hover:text-accent-foreground; }
-      .input-base { @apply flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50; }
-      .badge { @apply inline-flex items-center rounded-full border px-2.5 py-0.5 text-xs font-semibold transition-colors focus:outline-none focus:ring-2 focus:ring-ring; }
+      /* Reglas estrictas blindadas contra el Preflight de Tailwind */
+      .material-symbols-rounded { 
+        font-family: 'Material Symbols Rounded' !important;
+        font-weight: normal !important;
+        font-style: normal !important;
+        font-size: 24px;
+        line-height: 1 !important;
+        letter-spacing: normal !important;
+        text-transform: none !important;
+        display: inline-block; 
+        white-space: nowrap !important;
+        word-wrap: normal !important;
+        direction: ltr;
+        -webkit-font-smoothing: antialiased !important;
+        font-feature-settings: 'liga' !important;
+        font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24 !important; 
+      }
+      .icon-fill { 
+        font-variation-settings: 'FILL' 1, 'wght' 400, 'GRAD' 0, 'opsz' 24 !important; 
+      }
       
-      /* Overlays (Sheet style) */
-      .sheet-overlay { @apply fixed inset-0 z-50 bg-background/80 backdrop-blur-sm data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0; }
-      .sheet-content { @apply fixed z-50 gap-4 bg-background p-6 shadow-lg transition ease-in-out data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:duration-300 data-[state=open]:duration-500 inset-y-0 right-0 h-full w-full sm:max-w-md md:max-w-lg border-l data-[state=closed]:slide-out-to-right data-[state=open]:slide-in-from-right flex flex-col; }
+      .overlay-enter { transform: translateX(100%); opacity: 0; }
+      .overlay-enter-active { transform: translateX(0); opacity: 1; transition: all 0.3s cubic-bezier(0.2, 0, 0, 1); }
+      .overlay-exit { transform: translateX(0); opacity: 1; }
+      .overlay-exit-active { transform: translateX(100%); opacity: 0; transition: all 0.3s cubic-bezier(0.2, 0, 0, 1); }
     }
   </style>
+  
+  <style>
+    /* Animaciones CSS puro para mejor rendimiento */
+    @keyframes fadeUp { from { opacity: 0; transform: translateY(12px); } to { opacity: 1; transform: translateY(0); } }
+    .stagger-item { animation: fadeUp 0.35s cubic-bezier(0.2, 0, 0, 1) both; }
+    
+    @keyframes slideUpFade { 
+      0% { transform: translate(-50%, 100%); opacity: 0; } 
+      10%, 90% { transform: translate(-50%, 0); opacity: 1; }
+      100% { transform: translate(-50%, 100%); opacity: 0; }
+    }
+    .animate-snackbar { animation: slideUpFade 3s cubic-bezier(0.2, 0, 0, 1) forwards; }
+  </style>
 </head>
-<body>
+<body class="bg-m3-surface text-m3-onSurface antialiased selection:bg-m3-primaryContainer flex flex-col">
 
   <!-- ==================== PANTALLA LOGIN ==================== -->
-  <div id="view-login" class="fixed inset-0 z-[100] bg-background flex flex-col items-center justify-center p-4 transition-opacity duration-500">
-    <div class="card w-full max-w-sm p-8 flex flex-col items-center space-y-6">
-      <div class="w-12 h-12 rounded-lg bg-primary text-primary-foreground flex items-center justify-center shadow-sm">
-        <i data-lucide="package" class="w-6 h-6"></i>
+  <div id="view-login" class="absolute inset-0 z-50 bg-m3-surface flex flex-col items-center justify-center p-8 w-full transition-opacity duration-300">
+    <div class="md:bg-m3-surfaceContainerLow md:p-12 md:rounded-[32px] md:shadow-sm flex flex-col items-center w-full max-w-md">
+      <div class="w-20 h-20 rounded-[24px] bg-m3-primaryContainer text-m3-onPrimaryContainer flex items-center justify-center mb-6 shadow-m3-1">
+        <span class="material-symbols-rounded text-4xl">inventory_2</span>
       </div>
-      <div class="text-center space-y-2">
-        <h1 class="text-2xl font-bold tracking-tight">Kawas Stock</h1>
-        <p id="login-hint" class="text-sm text-muted-foreground">Iniciando sistema...</p>
-      </div>
+      <h1 class="text-3xl font-display font-medium mb-2 text-m3-onSurface">Kawas Stock</h1>
+      <p id="login-hint" class="text-m3-onSurfaceVariant text-sm mb-12 text-center">Iniciando sistema...</p>
       
-      <div class="w-full space-y-2">
-        <label class="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">PIN de Acceso</label>
-        <input id="inp-pin" type="password" inputmode="numeric" maxlength="4" disabled class="input-base text-center tracking-[1em] text-2xl h-14 font-mono">
-        <p id="login-error" class="text-[13px] text-destructive font-medium opacity-0 transition-opacity">PIN incorrecto</p>
+      <div class="w-full bg-m3-surfaceContainerHighest rounded-t-xl border-b-2 border-m3-primary px-4 pt-3 pb-2 relative mb-2">
+        <label class="text-xs text-m3-onSurfaceVariant font-medium">PIN de Acceso</label>
+        <input id="inp-pin" type="password" inputmode="numeric" maxlength="4" disabled class="w-full bg-transparent outline-none text-center tracking-[1em] text-3xl font-mono mt-1 text-m3-onSurface">
       </div>
-      
-      <div id="login-pills" class="flex flex-wrap justify-center gap-2 w-full pt-4"></div>
+      <div id="login-error" class="text-m3-error text-sm mt-2 h-5 opacity-0 transition-opacity font-medium">PIN incorrecto</div>
+      <div id="login-pills" class="flex flex-wrap justify-center gap-2 mt-8 w-full"></div>
     </div>
   </div>
 
-  <!-- ==================== APP SHELL (Sidebar/Bottom Nav) ==================== -->
-  <div id="app-shell" class="w-full h-full flex flex-col md:flex-row hidden bg-muted/10">
+  <!-- ==================== APP SHELL RESPONSIVO ==================== -->
+  <div id="app-shell" class="w-full h-full flex flex-col md:flex-row relative hidden bg-m3-surface">
     
-    <!-- DESKTOP SIDEBAR -->
-    <aside class="hidden md:flex w-64 flex-col border-r bg-background">
-      <div class="h-14 flex items-center px-6 border-b">
-        <div class="flex items-center gap-2 font-bold tracking-tight">
-          <i data-lucide="package" class="w-5 h-5"></i> Kawas Stock
+    <!-- NAVIGATION RAIL / BOTTOM NAV -->
+    <nav class="order-last md:order-first h-20 md:h-full md:w-[96px] bg-m3-surfaceContainer md:bg-m3-surface grid grid-cols-5 md:flex md:flex-col md:justify-start md:pt-6 md:gap-4 pb-[env(safe-area-inset-bottom)] shrink-0 z-20 shadow-[0_-1px_3px_rgba(0,0,0,0.05)] md:shadow-none md:border-r md:border-m3-surfaceVariant">
+      <button class="nav-btn flex flex-col items-center justify-center gap-1 md:gap-1.5 text-m3-onSurfaceVariant group active w-full md:py-2" data-tab="home">
+        <div class="w-14 h-8 md:w-14 md:h-10 rounded-full flex items-center justify-center indicator group-[.active]:bg-m3-secondaryContainer group-[.active]:text-m3-onSecondaryContainer transition-colors">
+          <span class="material-symbols-rounded group-[.active]:icon-fill">home</span>
         </div>
-      </div>
-      <div class="flex-1 overflow-auto py-4 px-3 space-y-1">
-        <button class="nav-btn w-full flex items-center gap-3 rounded-md px-3 py-2 text-sm font-medium hover:bg-muted transition-colors" data-tab="home">
-          <i data-lucide="layout-dashboard" class="w-4 h-4"></i> Resumen
-        </button>
-        <button class="nav-btn w-full flex items-center gap-3 rounded-md px-3 py-2 text-sm font-medium hover:bg-muted transition-colors" data-tab="search">
-          <i data-lucide="search" class="w-4 h-4"></i> Búsqueda
-        </button>
-        <button class="nav-btn w-full flex items-center gap-3 rounded-md px-3 py-2 text-sm font-medium hover:bg-muted transition-colors relative" data-tab="alerts">
-          <i data-lucide="alert-circle" class="w-4 h-4"></i> Alertas
-          <span id="badge-alerts-desktop" class="absolute right-3 flex h-2 w-2 rounded-full bg-destructive hidden"></span>
-        </button>
-        <button class="nav-btn w-full flex items-center gap-3 rounded-md px-3 py-2 text-sm font-medium hover:bg-muted transition-colors" data-tab="history">
-          <i data-lucide="history" class="w-4 h-4"></i> Historial
-        </button>
-        <button class="nav-btn w-full flex items-center gap-3 rounded-md px-3 py-2 text-sm font-medium hover:bg-muted transition-colors" data-tab="report">
-          <i data-lucide="file-text" class="w-4 h-4"></i> Reportes
-        </button>
-      </div>
-      <div class="p-4 border-t">
-        <div class="flex items-center gap-3 px-2">
-          <div class="w-8 h-8 rounded-full bg-muted flex items-center justify-center"><i data-lucide="user" class="w-4 h-4 text-muted-foreground"></i></div>
-          <div class="flex-1 overflow-hidden">
-            <p id="desktop-user" class="text-sm font-medium truncate">Usuario</p>
-            <p class="text-[11px] text-muted-foreground">Activo</p>
-          </div>
+        <span class="text-[11px] md:text-xs font-medium group-[.active]:font-bold group-[.active]:text-m3-onSurface">Inicio</span>
+      </button>
+      <button class="nav-btn flex flex-col items-center justify-center gap-1 md:gap-1.5 text-m3-onSurfaceVariant group w-full md:py-2" data-tab="search">
+        <div class="w-14 h-8 md:w-14 md:h-10 rounded-full flex items-center justify-center indicator group-[.active]:bg-m3-secondaryContainer group-[.active]:text-m3-onSecondaryContainer transition-colors">
+          <span class="material-symbols-rounded group-[.active]:icon-fill">search</span>
         </div>
-      </div>
-    </aside>
-
-    <!-- MOBILE BOTTOM NAV -->
-    <nav class="md:hidden order-last h-16 bg-background border-t flex justify-around items-center px-2 pb-[env(safe-area-inset-bottom)] shrink-0 z-20">
-      <button class="nav-btn flex flex-col items-center justify-center gap-1 text-muted-foreground hover:text-foreground w-full h-full" data-tab="home">
-        <i data-lucide="layout-dashboard" class="w-5 h-5"></i><span class="text-[10px] font-medium">Inicio</span>
+        <span class="text-[11px] md:text-xs font-medium group-[.active]:font-bold group-[.active]:text-m3-onSurface">Buscar</span>
       </button>
-      <button class="nav-btn flex flex-col items-center justify-center gap-1 text-muted-foreground hover:text-foreground w-full h-full" data-tab="search">
-        <i data-lucide="search" class="w-5 h-5"></i><span class="text-[10px] font-medium">Buscar</span>
+      <button class="nav-btn flex flex-col items-center justify-center gap-1 md:gap-1.5 text-m3-onSurfaceVariant group relative w-full md:py-2" data-tab="alerts">
+        <div id="badge-alerts" class="absolute top-2 right-3 md:right-6 w-2 h-2 bg-m3-error rounded-full hidden"></div>
+        <div class="w-14 h-8 md:w-14 md:h-10 rounded-full flex items-center justify-center indicator group-[.active]:bg-m3-secondaryContainer group-[.active]:text-m3-onSecondaryContainer transition-colors">
+          <span class="material-symbols-rounded group-[.active]:icon-fill">warning</span>
+        </div>
+        <span class="text-[11px] md:text-xs font-medium group-[.active]:font-bold group-[.active]:text-m3-onSurface">Alertas</span>
       </button>
-      <button class="nav-btn flex flex-col items-center justify-center gap-1 text-muted-foreground hover:text-foreground w-full h-full relative" data-tab="alerts">
-        <span id="badge-alerts-mobile" class="absolute top-2 right-4 flex h-2 w-2 rounded-full bg-destructive hidden"></span>
-        <i data-lucide="alert-circle" class="w-5 h-5"></i><span class="text-[10px] font-medium">Alertas</span>
+      <button class="nav-btn flex flex-col items-center justify-center gap-1 md:gap-1.5 text-m3-onSurfaceVariant group w-full md:py-2" data-tab="history">
+        <div class="w-14 h-8 md:w-14 md:h-10 rounded-full flex items-center justify-center indicator group-[.active]:bg-m3-secondaryContainer group-[.active]:text-m3-onSecondaryContainer transition-colors">
+          <span class="material-symbols-rounded group-[.active]:icon-fill">history</span>
+        </div>
+        <span class="text-[11px] md:text-xs font-medium group-[.active]:font-bold group-[.active]:text-m3-onSurface">Historial</span>
       </button>
-      <button class="nav-btn flex flex-col items-center justify-center gap-1 text-muted-foreground hover:text-foreground w-full h-full" data-tab="history">
-        <i data-lucide="history" class="w-5 h-5"></i><span class="text-[10px] font-medium">Historial</span>
-      </button>
-      <button class="nav-btn flex flex-col items-center justify-center gap-1 text-muted-foreground hover:text-foreground w-full h-full" data-tab="report">
-        <i data-lucide="file-text" class="w-5 h-5"></i><span class="text-[10px] font-medium">Reporte</span>
+      <button class="nav-btn flex flex-col items-center justify-center gap-1 md:gap-1.5 text-m3-onSurfaceVariant group w-full md:py-2" data-tab="report">
+        <div class="w-14 h-8 md:w-14 md:h-10 rounded-full flex items-center justify-center indicator group-[.active]:bg-m3-secondaryContainer group-[.active]:text-m3-onSecondaryContainer transition-colors">
+          <span class="material-symbols-rounded group-[.active]:icon-fill">description</span>
+        </div>
+        <span class="text-[11px] md:text-xs font-medium group-[.active]:font-bold group-[.active]:text-m3-onSurface">Reporte</span>
       </button>
     </nav>
 
-    <!-- MAIN CONTENT AREA -->
-    <div class="flex-1 flex flex-col relative min-w-0 overflow-hidden">
+    <!-- ÁREA DERECHA -->
+    <div class="flex-1 flex flex-col relative min-w-0 overflow-hidden bg-m3-surface">
       
-      <!-- Mobile Header / Desktop Topbar -->
-      <header class="h-14 flex items-center px-4 md:px-6 shrink-0 bg-background border-b z-10 justify-between">
-        <div>
-          <h1 id="header-title" class="text-lg font-semibold tracking-tight">Dashboard</h1>
+      <!-- Top App Bar -->
+      <header class="h-16 flex items-center px-4 md:px-8 gap-4 shrink-0 bg-m3-surface z-10 md:border-b md:border-m3-surfaceVariant/50">
+        <div class="md:hidden w-10 h-10 rounded-full bg-m3-primaryContainer text-m3-onPrimaryContainer flex items-center justify-center shrink-0">
+          <span class="material-symbols-rounded text-xl" id="header-icon">inventory_2</span>
         </div>
-        <button onclick="app.sync(true)" class="btn btn-ghost w-9 h-9 p-0 rounded-full">
-          <i id="sync-icon" data-lucide="refresh-cw" class="w-4 h-4 text-muted-foreground"></i>
+        <div class="flex-1 min-w-0">
+          <h1 id="header-title" class="text-xl md:text-2xl font-display font-medium text-m3-onSurface truncate">Inicio</h1>
+          <p id="header-subtitle" class="text-xs text-m3-onSurfaceVariant truncate hidden"></p>
+        </div>
+        <button onclick="app.sync(true)" class="w-10 h-10 rounded-full flex items-center justify-center hover:bg-m3-surfaceContainer active:bg-m3-surfaceVariant transition-colors">
+          <span id="sync-icon" class="material-symbols-rounded text-m3-onSurfaceVariant">sync</span>
         </button>
       </header>
 
-      <!-- Scrollable Views -->
-      <main id="main-content" class="flex-1 overflow-y-auto no-scrollbar p-4 md:p-8 relative">
+      <!-- Contenedor Principal -->
+      <main id="main-content" class="flex-1 overflow-y-auto overflow-x-hidden relative no-scrollbar pb-6 px-4 md:px-8">
         
-        <!-- Tab: HOME -->
-        <section id="tab-home" class="w-full h-full flex flex-col space-y-6 max-w-6xl mx-auto">
-          <!-- KPIs -->
-          <div class="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
-            <div class="card p-6">
-              <div class="flex items-center justify-between space-y-0 pb-2">
-                <h3 class="tracking-tight text-sm font-medium">Stock Global</h3>
-                <i data-lucide="layers" class="h-4 w-4 text-muted-foreground"></i>
+        <!-- Tab 1: Inicio -->
+        <section id="tab-home" class="w-full h-full flex flex-col py-2 transition-transform max-w-6xl mx-auto">
+          <div class="bg-m3-surfaceContainerLow rounded-3xl p-5 md:p-8 mb-6 border-t-4 border-m3-primary shadow-sm md:flex md:items-center md:justify-between">
+            <div class="md:w-1/2">
+              <div class="flex items-center justify-between md:justify-start md:gap-4 mb-4">
+                <span class="text-xs font-medium text-m3-onSurfaceVariant uppercase tracking-wider">Stock Global</span>
+                <span id="home-user" class="inline-flex items-center gap-1 bg-m3-surfaceContainerHigh px-2 py-1 rounded-full text-xs font-medium"><span class="material-symbols-rounded text-[14px]">person</span>Usuario</span>
               </div>
-              <div id="home-total-stock" class="text-2xl font-bold">0</div>
-              <p class="text-xs text-muted-foreground">Unidades totales</p>
+              <div id="home-total-stock" class="text-5xl md:text-7xl font-light text-m3-onSurface font-mono tracking-tight mb-4 md:mb-0">0</div>
             </div>
-            <div class="card p-6">
-              <div class="flex items-center justify-between space-y-0 pb-2">
-                <h3 class="tracking-tight text-sm font-medium">Óptimos</h3>
-                <i data-lucide="check-circle-2" class="h-4 w-4 text-emerald-500"></i>
+            <div class="grid grid-cols-3 gap-3 md:gap-6 md:w-1/2">
+              <div onclick="app.switchTab('home')" class="bg-m3-surfaceContainer px-3 py-2 md:p-4 rounded-2xl md:rounded-3xl cursor-pointer active:scale-95 hover:bg-m3-surfaceContainerHigh transition-all">
+                <div id="home-kpi-ok" class="text-xl md:text-3xl font-medium text-m3-success font-mono">0</div><div class="text-[10px] md:text-xs text-m3-onSurfaceVariant uppercase mt-1">Óptimos</div>
               </div>
-              <div id="home-kpi-ok" class="text-2xl font-bold">0</div>
-              <p class="text-xs text-muted-foreground">Stock saludable</p>
-            </div>
-            <div onclick="app.switchTab('alerts')" class="card p-6 cursor-pointer hover:bg-muted/50 transition-colors">
-              <div class="flex items-center justify-between space-y-0 pb-2">
-                <h3 class="tracking-tight text-sm font-medium">Bajos</h3>
-                <i data-lucide="alert-triangle" class="h-4 w-4 text-amber-500"></i>
+              <div onclick="app.switchTab('alerts')" class="bg-m3-surfaceContainer px-3 py-2 md:p-4 rounded-2xl md:rounded-3xl cursor-pointer active:scale-95 hover:bg-m3-surfaceContainerHigh transition-all">
+                <div id="home-kpi-low" class="text-xl md:text-3xl font-medium text-m3-warning font-mono">0</div><div class="text-[10px] md:text-xs text-m3-onSurfaceVariant uppercase mt-1">Bajos</div>
               </div>
-              <div id="home-kpi-low" class="text-2xl font-bold">0</div>
-              <p class="text-xs text-muted-foreground">Requieren atención</p>
-            </div>
-            <div onclick="app.switchTab('alerts')" class="card p-6 cursor-pointer hover:bg-muted/50 transition-colors">
-              <div class="flex items-center justify-between space-y-0 pb-2">
-                <h3 class="tracking-tight text-sm font-medium">Críticos</h3>
-                <i data-lucide="alert-octagon" class="h-4 w-4 text-destructive"></i>
+              <div onclick="app.switchTab('alerts')" class="bg-m3-surfaceContainer px-3 py-2 md:p-4 rounded-2xl md:rounded-3xl cursor-pointer active:scale-95 hover:bg-m3-surfaceContainerHigh transition-all">
+                <div id="home-kpi-crit" class="text-xl md:text-3xl font-medium text-m3-error font-mono">0</div><div class="text-[10px] md:text-xs text-m3-onSurfaceVariant uppercase mt-1">Críticos</div>
               </div>
-              <div id="home-kpi-crit" class="text-2xl font-bold text-destructive">0</div>
-              <p class="text-xs text-muted-foreground">Agotados o críticos</p>
             </div>
           </div>
-
-          <div>
-            <h2 class="text-lg font-semibold tracking-tight mb-4">Categorías</h2>
-            <div id="home-categories" class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4"></div>
-          </div>
+          <div class="text-sm font-medium text-m3-onSurfaceVariant tracking-wider uppercase mb-3 px-1">Categorías</div>
+          <div id="home-categories" class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3 md:gap-4"></div>
         </section>
 
-        <!-- Tab: SEARCH -->
-        <section id="tab-search" class="w-full h-full hidden flex-col max-w-4xl mx-auto space-y-4">
-          <div class="relative">
-            <i data-lucide="search" class="absolute left-3 top-3 h-4 w-4 text-muted-foreground"></i>
-            <input id="inp-search" type="text" placeholder="Buscar productos..." class="input-base pl-9 h-12">
-            <button id="btn-clear-search" class="hidden absolute right-3 top-3 text-muted-foreground hover:text-foreground"><i data-lucide="x" class="h-4 w-4"></i></button>
+        <!-- Tab 2: Búsqueda -->
+        <section id="tab-search" class="w-full h-full hidden flex-col py-2 max-w-4xl mx-auto">
+          <div class="bg-m3-surfaceContainerHigh h-14 rounded-full flex items-center px-4 gap-3 mb-4 shrink-0">
+            <span class="material-symbols-rounded text-m3-onSurfaceVariant">search</span>
+            <input id="inp-search" type="text" placeholder="Buscar producto..." class="flex-1 bg-transparent outline-none text-m3-onSurface text-base">
+            <button id="btn-clear-search" class="hidden text-m3-onSurfaceVariant"><span class="material-symbols-rounded text-xl">close</span></button>
           </div>
-          <div class="card overflow-hidden">
-            <div id="search-results" class="divide-y"></div>
-          </div>
+          <div id="search-results" class="flex flex-col md:grid md:grid-cols-2 lg:grid-cols-3 md:gap-4"></div>
         </section>
 
-        <!-- Tab: ALERTS -->
-        <section id="tab-alerts" class="w-full h-full hidden flex-col max-w-4xl mx-auto">
-          <div class="card overflow-hidden">
-            <div id="alerts-list" class="divide-y"></div>
-          </div>
+        <!-- Tab 3: Alertas -->
+        <section id="tab-alerts" class="w-full h-full hidden flex-col py-2 max-w-5xl mx-auto">
+          <div id="alerts-list" class="flex flex-col md:grid md:grid-cols-2 lg:grid-cols-3 md:gap-4"></div>
         </section>
 
-        <!-- Tab: HISTORY -->
-        <section id="tab-history" class="w-full h-full hidden flex-col max-w-4xl mx-auto">
-          <div class="card overflow-hidden">
-            <div id="history-list" class="divide-y"></div>
-          </div>
+        <!-- Tab 4: Historial -->
+        <section id="tab-history" class="w-full h-full hidden flex-col py-2 max-w-4xl mx-auto">
+          <div id="history-list" class="flex flex-col md:bg-m3-surfaceContainerLow md:rounded-3xl md:p-4"></div>
         </section>
 
-        <!-- Tab: REPORT -->
-        <section id="tab-report" class="w-full h-full hidden flex-col max-w-md mx-auto py-8">
-          <div class="card p-8 flex flex-col items-center text-center space-y-4">
-            <div class="w-12 h-12 rounded-full bg-primary/10 text-primary flex items-center justify-center">
-              <i data-lucide="file-down" class="w-6 h-6"></i>
+        <!-- Tab 5: Reporte -->
+        <section id="tab-report" class="w-full h-full hidden flex-col py-2 max-w-md mx-auto">
+          <div class="bg-m3-surfaceContainer rounded-3xl p-6 md:p-10 mb-4 text-center">
+            <div class="w-16 h-16 bg-m3-primaryContainer text-m3-primary rounded-full flex items-center justify-center mx-auto mb-4">
+              <span class="material-symbols-rounded text-3xl">picture_as_pdf</span>
             </div>
-            <div>
-              <h2 class="text-xl font-bold tracking-tight">Exportar Inventario</h2>
-              <p class="text-sm text-muted-foreground mt-1">Genera un documento PDF detallado con el estado actual del stock y proyecciones.</p>
-            </div>
-            <div class="w-full pt-4 space-y-2">
-              <button onclick="app.generatePDF()" class="btn btn-primary w-full gap-2">
-                <i data-lucide="download" class="w-4 h-4"></i> Descargar PDF
-              </button>
-              <button onclick="window.open(SHEET_URL, '_blank')" class="btn btn-outline w-full gap-2">
-                <i data-lucide="table" class="w-4 h-4"></i> Abrir Google Sheets
-              </button>
-            </div>
+            <h2 class="text-xl md:text-2xl font-display font-medium mb-2">Exportar Inventario</h2>
+            <p class="text-sm text-m3-onSurfaceVariant mb-8">Genera un reporte consolidado con proyecciones y estado actual.</p>
+            <button onclick="app.generatePDF()" class="w-full h-12 bg-m3-primary text-m3-onPrimary rounded-full font-medium shadow-sm active:scale-95 transition-transform flex items-center justify-center gap-2">
+              <span class="material-symbols-rounded">download</span> Descargar PDF
+            </button>
+            <button onclick="window.open(SHEET_URL, '_blank')" class="w-full h-12 bg-transparent text-m3-primary rounded-full font-medium mt-4 active:bg-m3-primaryContainer/30 transition-colors">
+              Abrir Base de Datos
+            </button>
           </div>
         </section>
 
       </main>
-    </div>
-  </div>
 
-  <!-- ==================== OVERLAYS (SHADCN SHEETS) ==================== -->
-  
-  <!-- Backdrop (Compartido) -->
-  <div id="sheet-backdrop" onclick="app.closeAllOverlays()" class="sheet-overlay hidden" data-state="closed"></div>
-
-  <!-- Sheet: Categoría -->
-  <div id="view-category" class="sheet-content hidden" data-state="closed">
-    <div class="flex items-center justify-between border-b pb-4">
-      <div>
-        <h2 id="cat-title" class="text-lg font-semibold tracking-tight">Categoría</h2>
-        <p id="cat-subtitle" class="text-sm text-muted-foreground"></p>
-      </div>
-      <button onclick="app.closeOverlay('category')" class="btn btn-ghost w-8 h-8 p-0 rounded-full"><i data-lucide="x" class="w-4 h-4"></i></button>
-    </div>
-    <div id="cat-list" class="flex-1 overflow-y-auto no-scrollbar space-y-3 py-2"></div>
-  </div>
-
-  <!-- Sheet: Subcategoría (Lista de Productos) -->
-  <div id="view-subcat" class="sheet-content hidden" data-state="closed">
-    <div class="flex items-center justify-between border-b pb-4">
-      <div class="flex items-center gap-2">
-        <button onclick="app.closeOverlay('subcat')" class="btn btn-ghost w-8 h-8 p-0 rounded-full -ml-2"><i data-lucide="arrow-left" class="w-4 h-4"></i></button>
-        <div>
-          <h2 id="subcat-title" class="text-lg font-semibold tracking-tight">Productos</h2>
-          <p id="subcat-subtitle" class="text-sm text-muted-foreground"></p>
-        </div>
-      </div>
-    </div>
-    <div class="flex-1 overflow-y-auto no-scrollbar py-2">
-      <div class="card overflow-hidden">
-        <div id="subcat-list" class="divide-y"></div>
-      </div>
-    </div>
-  </div>
-
-  <!-- Sheet: Detalle de Item -->
-  <div id="view-item" class="sheet-content hidden sm:max-w-md md:max-w-xl" data-state="closed">
-    <div class="flex items-center justify-between border-b pb-4 shrink-0">
-      <div class="flex items-center gap-2">
-        <button onclick="app.closeOverlay('item')" class="btn btn-ghost w-8 h-8 p-0 rounded-full -ml-2"><i data-lucide="arrow-left" class="w-4 h-4"></i></button>
-        <div>
-          <h2 id="item-title" class="text-lg font-semibold tracking-tight leading-tight">Nombre</h2>
-          <p id="item-subtitle" class="text-sm text-muted-foreground"></p>
-        </div>
-      </div>
-    </div>
-    
-    <div class="flex-1 overflow-y-auto no-scrollbar py-4 space-y-6">
+      <!-- ==================== OVERLAYS ==================== -->
       
-      <!-- Status Card -->
-      <div class="card p-6 flex flex-col items-center justify-center text-center relative overflow-hidden">
-        <div id="item-status-bg" class="absolute top-0 left-0 w-full h-1 bg-primary"></div>
-        <p class="text-xs font-medium text-muted-foreground uppercase tracking-widest mb-2">Stock Actual</p>
-        <div class="flex items-baseline gap-1 mb-2">
-          <span id="item-stock" class="text-6xl font-bold tracking-tighter">0</span>
-          <span id="item-unit" class="text-muted-foreground">uds</span>
-        </div>
-        <div id="item-status-chip" class="badge mt-2">OK</div>
-        
-        <div class="w-full max-w-xs mt-6 space-y-2">
-          <div class="flex justify-between text-xs text-muted-foreground">
-            <span>0</span>
-            <span>Mínimo: <span id="item-min"></span></span>
+      <!-- Overlay: Categoría / Subcategorías -->
+      <div id="view-category" class="absolute inset-0 z-30 bg-m3-surface w-full flex flex-col overlay-enter hidden">
+        <header class="h-16 flex items-center px-4 md:px-8 shrink-0 bg-m3-surface border-b border-m3-surfaceVariant md:border-m3-surfaceVariant/50">
+          <button onclick="app.closeOverlay('category')" class="w-10 h-10 -ml-2 rounded-full flex items-center justify-center hover:bg-m3-surfaceContainer active:bg-m3-surfaceVariant text-m3-onSurfaceVariant transition-colors">
+            <span class="material-symbols-rounded">arrow_back</span>
+          </button>
+          <div class="flex-1 min-w-0 ml-2">
+            <h1 id="cat-title" class="text-lg md:text-xl font-display font-medium text-m3-onSurface truncate">Categoría</h1>
+            <p id="cat-subtitle" class="text-xs text-m3-onSurfaceVariant truncate"></p>
           </div>
-          <div class="h-2 w-full bg-secondary rounded-full overflow-hidden">
-            <div id="item-progress" class="h-full bg-primary transition-all"></div>
-          </div>
-        </div>
+        </header>
+        <main class="flex-1 overflow-y-auto no-scrollbar"><div id="cat-list" class="flex flex-col py-4 px-4 md:px-8 gap-3 max-w-4xl mx-auto w-full md:grid md:grid-cols-2 lg:grid-cols-3"></div></main>
       </div>
 
-      <!-- Projection Alert (Optional) -->
-      <div id="item-proj-card" class="rounded-lg border bg-card text-card-foreground p-4 flex items-start gap-4 hidden">
-        <i data-lucide="trending-down" class="w-5 h-5 text-muted-foreground mt-0.5"></i>
-        <div class="flex-1">
-          <h4 id="proj-title" class="text-sm font-semibold">Proyección</h4>
-          <p id="proj-subtitle" class="text-xs text-muted-foreground mb-3">Basado en movimientos.</p>
-          <div class="grid grid-cols-3 gap-2 divide-x border-t pt-3">
-            <div class="text-center"><p id="proj-days" class="text-lg font-bold">0</p><p class="text-[10px] text-muted-foreground uppercase">Días Rest.</p></div>
-            <div class="text-center"><p id="proj-use" class="text-lg font-bold">0</p><p class="text-[10px] text-muted-foreground uppercase">Uso Diario</p></div>
-            <div class="text-center"><p id="proj-date" class="text-lg font-bold">-</p><p class="text-[10px] text-muted-foreground uppercase">Agotamiento</p></div>
+      <!-- Overlay: Lista de Productos -->
+      <div id="view-subcat" class="absolute inset-0 z-40 bg-m3-surface w-full flex flex-col overlay-enter hidden">
+        <header class="h-16 flex items-center px-4 md:px-8 shrink-0 bg-m3-surface border-b border-m3-surfaceVariant md:border-m3-surfaceVariant/50">
+          <button onclick="app.closeOverlay('subcat')" class="w-10 h-10 -ml-2 rounded-full flex items-center justify-center hover:bg-m3-surfaceContainer active:bg-m3-surfaceVariant text-m3-onSurfaceVariant transition-colors">
+            <span class="material-symbols-rounded">arrow_back</span>
+          </button>
+          <div class="flex-1 min-w-0 ml-2">
+            <h1 id="subcat-title" class="text-lg md:text-xl font-display font-medium text-m3-onSurface truncate">Productos</h1>
+            <p id="subcat-subtitle" class="text-xs text-m3-onSurfaceVariant truncate"></p>
           </div>
-        </div>
+        </header>
+        <main class="flex-1 overflow-y-auto no-scrollbar"><div id="subcat-list" class="flex flex-col md:grid md:grid-cols-2 lg:grid-cols-3 gap-2 md:gap-4 py-4 px-4 md:px-8 max-w-6xl mx-auto w-full"></div></main>
       </div>
 
-      <!-- Actions -->
-      <div id="item-actions" class="grid grid-cols-3 gap-3">
-        <button onclick="app.openAdjust('in')" class="btn btn-outline h-auto py-4 flex-col gap-2">
-          <i data-lucide="plus-circle" class="w-5 h-5 text-emerald-500"></i><span>Ingreso</span>
-        </button>
-        <button onclick="app.openAdjust('out')" class="btn btn-outline h-auto py-4 flex-col gap-2">
-          <i data-lucide="minus-circle" class="w-5 h-5 text-destructive"></i><span>Salida</span>
-        </button>
-        <button onclick="app.openAdjust('set')" class="btn btn-outline h-auto py-4 flex-col gap-2">
-          <i data-lucide="edit-3" class="w-5 h-5 text-primary"></i><span>Ajustar</span>
-        </button>
-      </div>
-
-      <!-- Form Adjust -->
-      <div id="item-adjust-form" class="card p-5 hidden flex-col space-y-4">
-        <h3 id="adj-title" class="font-semibold tracking-tight">Ajuste Manual</h3>
-        <div class="space-y-3">
-          <div>
-            <label class="text-xs font-medium mb-1 block">Cantidad</label>
-            <input id="inp-adj-val" type="number" inputmode="numeric" class="input-base text-lg font-mono">
+      <!-- Overlay: Detalle de Item -->
+      <div id="view-item" class="absolute inset-0 z-50 bg-m3-surface w-full flex flex-col overlay-enter hidden">
+        <header class="h-16 flex items-center px-4 md:px-8 shrink-0 bg-m3-surface border-b border-m3-surfaceVariant/0 md:border-m3-surfaceVariant/50">
+          <button onclick="app.closeOverlay('item')" class="w-10 h-10 -ml-2 rounded-full flex items-center justify-center hover:bg-m3-surfaceContainer active:bg-m3-surfaceVariant text-m3-onSurfaceVariant transition-colors">
+            <span class="material-symbols-rounded">arrow_back</span>
+          </button>
+          <div class="flex-1 min-w-0 ml-2">
+            <h1 id="item-title" class="text-lg md:text-xl font-display font-medium text-m3-onSurface truncate leading-tight">Nombre</h1>
+            <p id="item-subtitle" class="text-xs text-m3-onSurfaceVariant truncate leading-tight mt-[1px]">Categoría</p>
           </div>
-          <div>
-            <label class="text-xs font-medium mb-1 block">Nota (opcional)</label>
-            <input id="inp-adj-note" type="text" class="input-base">
-          </div>
-        </div>
-        <div class="flex justify-end gap-2 pt-2">
-          <button onclick="app.closeAdjust()" class="btn btn-ghost">Cancelar</button>
-          <button onclick="app.confirmAdjust()" class="btn btn-primary">Confirmar</button>
-        </div>
-      </div>
+        </header>
+        <main class="flex-1 overflow-y-auto no-scrollbar px-4 md:px-8 pb-8 flex flex-col items-center">
+          
+          <div class="w-full max-w-3xl">
+            <!-- Tarjeta Stock -->
+            <div class="bg-m3-surfaceContainerLow rounded-3xl p-6 md:p-8 text-center border-t-4 border-m3-primary mb-4 md:mb-6 mt-2 md:mt-6 shadow-sm">
+              <div class="text-xs font-medium text-m3-onSurfaceVariant tracking-widest uppercase mb-1">Stock Actual</div>
+              <div id="item-stock" class="text-6xl md:text-8xl font-light text-m3-primary font-mono tracking-tight mb-2">0</div>
+              <div id="item-unit" class="text-m3-onSurfaceVariant text-sm mb-4 md:mb-6">unidades</div>
+              <div id="item-status-chip" class="inline-flex items-center gap-1.5 px-4 md:px-6 py-1.5 md:py-2 rounded-full text-sm md:text-base font-medium"></div>
+              <div class="mt-6 md:mt-8 bg-m3-surfaceContainerHigh h-2 rounded-full overflow-hidden"><div id="item-progress" class="h-full bg-m3-primary transition-all"></div></div>
+              <div class="text-[11px] text-m3-onSurfaceVariant mt-2 text-right">Mínimo: <span id="item-min"></span></div>
+            </div>
 
-      <!-- History -->
-      <div>
-        <h3 class="text-sm font-semibold tracking-tight mb-3">Historial Reciente</h3>
-        <div class="card overflow-hidden">
-          <div id="item-history-list" class="divide-y"></div>
-        </div>
+            <div class="md:grid md:grid-cols-2 md:gap-6">
+              <!-- Columna 1 (Desktop) -->
+              <div>
+                <!-- Proyección -->
+                <div id="item-proj-card" class="bg-m3-surfaceContainer rounded-3xl p-5 md:p-6 mb-4 hidden">
+                  <div class="flex items-center justify-between mb-4">
+                    <div>
+                      <div id="proj-title" class="text-sm md:text-base font-medium text-m3-onSurface"></div>
+                      <div id="proj-subtitle" class="text-[11px] text-m3-onSurfaceVariant mt-0.5"></div>
+                    </div>
+                    <span class="material-symbols-rounded text-m3-primary bg-m3-primaryContainer p-1.5 rounded-full text-[16px] md:text-[20px]">insights</span>
+                  </div>
+                  <div class="grid grid-cols-3 gap-2 text-center">
+                    <div><div id="proj-days" class="text-xl md:text-2xl font-mono text-m3-onSurface"></div><div class="text-[10px] md:text-[11px] text-m3-onSurfaceVariant mt-1">Días Rest.</div></div>
+                    <div><div id="proj-use" class="text-xl md:text-2xl font-mono text-m3-onSurface"></div><div class="text-[10px] md:text-[11px] text-m3-onSurfaceVariant mt-1">Uso Diario</div></div>
+                    <div><div id="proj-date" class="text-xl md:text-2xl font-mono text-m3-onSurface"></div><div class="text-[10px] md:text-[11px] text-m3-onSurfaceVariant mt-1">Fecha Est.</div></div>
+                  </div>
+                </div>
+
+                <!-- Botones -->
+                <div id="item-actions" class="grid grid-cols-3 gap-3 mb-6">
+                  <button onclick="app.openAdjust('in')" class="h-20 bg-m3-successContainer text-m3-onSuccessContainer rounded-2xl flex flex-col items-center justify-center gap-1 active:scale-95 hover:brightness-95 transition-all">
+                    <span class="material-symbols-rounded">add</span><span class="text-sm font-medium">Ingreso</span>
+                  </button>
+                  <button onclick="app.openAdjust('out')" class="h-20 bg-m3-errorContainer text-m3-onErrorContainer rounded-2xl flex flex-col items-center justify-center gap-1 active:scale-95 hover:brightness-95 transition-all">
+                    <span class="material-symbols-rounded">remove</span><span class="text-sm font-medium">Salida</span>
+                  </button>
+                  <button onclick="app.openAdjust('set')" class="h-20 bg-m3-secondaryContainer text-m3-onSecondaryContainer rounded-2xl flex flex-col items-center justify-center gap-1 active:scale-95 hover:brightness-95 transition-all">
+                    <span class="material-symbols-rounded">edit</span><span class="text-sm font-medium">Ajustar</span>
+                  </button>
+                </div>
+
+                <!-- Form Ajuste -->
+                <div id="item-adjust-form" class="bg-m3-surfaceContainer rounded-3xl p-5 md:p-6 hidden flex-col mb-6">
+                  <h3 id="adj-title" class="text-base font-medium mb-4 text-m3-onSurface">Ajuste</h3>
+                  <div class="bg-m3-surfaceContainerHighest rounded-t-xl border-b-2 border-m3-primary px-4 pt-2 pb-1 mb-3">
+                    <label class="text-[10px] text-m3-onSurfaceVariant font-medium">Cantidad</label>
+                    <input id="inp-adj-val" type="number" inputmode="numeric" class="w-full bg-transparent outline-none text-3xl font-mono text-m3-onSurface">
+                  </div>
+                  <div class="bg-m3-surfaceContainerHighest rounded-t-xl border-b-2 border-m3-outline px-4 pt-2 pb-2 mb-5">
+                    <label class="text-[10px] text-m3-onSurfaceVariant font-medium">Nota opcional</label>
+                    <input id="inp-adj-note" type="text" class="w-full bg-transparent outline-none text-sm text-m3-onSurface mt-1">
+                  </div>
+                  <div class="flex justify-end gap-2">
+                    <button onclick="app.closeAdjust()" class="px-4 py-2 text-m3-primary font-medium rounded-full hover:bg-m3-primaryContainer/50 text-sm transition-colors">Cancelar</button>
+                    <button onclick="app.confirmAdjust()" class="px-5 py-2 bg-m3-primary text-m3-onPrimary font-medium rounded-full active:opacity-80 hover:shadow-md text-sm transition-all">Confirmar</button>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Columna 2 (Desktop) -->
+              <div>
+                <div class="text-sm font-medium text-m3-onSurfaceVariant uppercase tracking-wider mb-3 md:mt-0">Historial Reciente</div>
+                <div id="item-history-list" class="flex flex-col md:bg-m3-surfaceContainerLow md:rounded-3xl md:p-4"></div>
+              </div>
+            </div>
+          </div>
+        </main>
       </div>
 
     </div>
   </div>
 
-  <!-- ==================== TOAST (shadcn style) ==================== -->
-  <div id="toast-container" class="fixed bottom-4 right-4 z-[110] flex flex-col gap-2 pointer-events-none">
-    <!-- Toasts se inyectan aquí -->
+  <!-- ==================== SNACKBAR ==================== -->
+  <div id="snackbar" class="fixed bottom-[100px] md:bottom-10 left-1/2 -translate-x-1/2 bg-[#313033] text-[#F4EFF4] px-4 py-3 rounded-xl shadow-lg flex items-center gap-3 text-sm z-[60] opacity-0 pointer-events-none min-w-[300px]">
+    <span id="sb-icon" class="material-symbols-rounded text-m3-successContainer">check_circle</span>
+    <span id="sb-text" class="flex-1">Mensaje</span>
   </div>
 
   <!-- ==================== LÓGICA DE APLICACIÓN ==================== -->
@@ -425,17 +388,21 @@
     let API_URL = "https://script.google.com/macros/s/AKfycbyEc51AIkfpgZzzfv_qHWfkQUObG824eNsg8sCZL0KU8r9k0lhVbx4EKYP1Ktq7Knk_gg/exec";
     const SHEET_URL = "https://docs.google.com/spreadsheets/d/1eF4MZHXzz_UQOvNbni-g0ljoD1fJIeg_QsHG8H6ievo/edit";
     
-    const FALLBACK_ITEMS = [{"id":"e1","cat":"Etiquetas Adhesivas","subcat":"1Kg Funsmart","name":"Espresso Original","stock":600,"min":100,"unit":"uds","alert":""},{"id":"b1","cat":"Bolsas","subcat":"MTPACK Impresas","name":"MTPACK Impresas 250g","stock":75,"min":500,"unit":"uds","alert":""},{"id":"c1","cat":"Cajas","subcat":"Kawas Grandes","name":"Caja Kawas SYT 12KG","stock":1850,"min":500,"unit":"uds","alert":""}];
+    const FALLBACK_ITEMS = [{"id":"e1","cat":"Etiquetas Adhesivas","subcat":"1Kg Funsmart","name":"Espresso Original","stock":600,"min":100,"unit":"uds","alert":""},{"id":"e2","cat":"Etiquetas Adhesivas","subcat":"1Kg Funsmart","name":"Espresso Frutal","stock":142,"min":150,"unit":"uds","alert":"Pedir pronto"},{"id":"b1","cat":"Bolsas","subcat":"MTPACK Impresas","name":"MTPACK Impresas 250g","stock":75,"min":500,"unit":"uds","alert":""},{"id":"c1","cat":"Cajas","subcat":"Kawas Grandes","name":"Caja Kawas SYT 12KG","stock":1850,"min":500,"unit":"uds","alert":""}];
     const CC_KNOWN = {
-      "Etiquetas Adhesivas": {i:'tag'}, "Bolsas": {i:'shopping-bag'}, "Cajas": {i:'package'},
-      "Empaque y Despacho": {i:'box'}, "Cold Brew": {i:'coffee'}, "Otros": {i:'more-horizontal'}
+      "Etiquetas Adhesivas": {i:'label',c:'text-[#0061A4]',b:'bg-[#0061A4]/10'},
+      "Bolsas": {i:'shopping_bag',c:'text-[#146C2E]',b:'bg-[#146C2E]/10'},
+      "Cajas": {i:'inventory_2',c:'text-[#BA1A1A]',b:'bg-[#BA1A1A]/10'},
+      "Empaque y Despacho": {i:'package_2',c:'text-[#825500]',b:'bg-[#825500]/10'},
+      "Cold Brew": {i:'coffee',c:'text-[#0061A4]',b:'bg-[#0061A4]/10'},
+      "Otros": {i:'more_horiz',c:'text-[#6B5778]',b:'bg-[#6B5778]/10'}
     };
     const FALLBACK_USERS = [{n:"Admin",p:"1234"},{n:"Bodega",p:"5678"}];
     const STC = {
-      zero: { l:"Agotado", c:"text-destructive bg-destructive/10 border-destructive/20", i:"alert-octagon", v:0 },
-      crit: { l:"Crítico", c:"text-destructive bg-destructive/10 border-destructive/20", i:"alert-triangle", v:1 },
-      low:  { l:"Bajo", c:"text-amber-600 bg-amber-500/10 border-amber-500/20", i:"info", v:2 },
-      ok:   { l:"OK", c:"text-emerald-600 bg-emerald-500/10 border-emerald-500/20", i:"check-circle-2", v:3 }
+      zero: { l:"Agotado", c:"text-m3-onErrorContainer", b:"bg-m3-errorContainer", i:"error", v:0 },
+      crit: { l:"Crítico", c:"text-m3-onErrorContainer", b:"bg-m3-errorContainer", i:"warning", v:1 },
+      low:  { l:"Bajo", c:"text-m3-onWarningContainer", b:"bg-m3-warningContainer", i:"info", v:2 },
+      ok:   { l:"OK", c:"text-m3-onSuccessContainer", b:"bg-m3-successContainer", i:"check_circle", v:3 }
     };
 
     const st = (x) => { if(x.stock<=0)return"zero"; if(x.min>0&&x.stock<x.min*0.3)return"crit"; if(x.min>0&&x.stock<x.min)return"low"; return"ok"; };
@@ -443,29 +410,33 @@
     
     function calcProjection(item){
       var pad=function(n){return("0"+n).slice(-2)};
-      if(item.stock<=0) return {title:"Sin stock",subtitle:"No hay unidades disponibles",days:"0",dailyUse:"-",dateOut:"-",color:"text-destructive"};
+      if(item.stock<=0) return {icon:"error",title:"Sin stock",subtitle:"No hay unidades disponibles",days:"0",dailyUse:"-",dateOut:"-",color:"text-m3-error"};
       var moves=app.state.hist.filter(function(h){return h.id===item.id});
       var consumptions=[];
       moves.forEach(function(h){ if(h.ns<h.os) consumptions.push({amount:h.os-h.ns, ts:h.ts, tp:h.tp}); });
 
       function parseTS(t){
-        if(!t)return null; var d=new Date(t); if(!isNaN(d.getTime()))return d;
+        if(!t)return null;
+        var d=new Date(t); if(!isNaN(d.getTime()))return d;
         var parts=t.split(" ");
         if(parts[0]&&parts[0].indexOf("/")>-1){
           var dp=parts[0].split("/"), day=parseInt(dp[0]), mon=parseInt(dp[1])-1, yr=dp[2]?parseInt(dp[2]):new Date().getFullYear();
           if(yr<100)yr+=2000;
           var hr=0,mi=0; if(parts[1]&&parts[1].indexOf(":")>-1){var tp=parts[1].split(":");hr=parseInt(tp[0]);mi=parseInt(tp[1])}
           return new Date(yr,mon,day,hr,mi);
-        } return null;
+        }
+        return null;
       }
 
       if(consumptions.length<1){
         if(item.min>0){
-          var estDaily=Math.max(1,Math.round(item.min/14)); var estDays=Math.round(item.stock/estDaily);
+          var estDaily=Math.max(1,Math.round(item.min/14));
+          var estDays=Math.round(item.stock/estDaily);
           var estDate=new Date();estDate.setDate(estDate.getDate()+estDays);
-          var dc=estDays<=7?"text-destructive":estDays<=21?"text-amber-500":"text-emerald-500";
-          return {title:estDays<=7?"Agotamiento inminente":estDays<=21?"Stock limitado":"Stock holgado",subtitle:"Estimación (Faltan datos)",days:String(estDays),dailyUse:"~"+estDaily,dateOut:pad(estDate.getDate())+"/"+pad(estDate.getMonth()+1),color:dc};
-        } return null;
+          var dc=estDays<=7?"text-m3-error":estDays<=21?"text-m3-warning":"text-m3-success";
+          return {title:estDays<=7?"Agotamiento inminente":estDays<=21?"Stock limitado":"Stock holgado",subtitle:"Estimado",days:String(estDays),dailyUse:"~"+estDaily,dateOut:pad(estDate.getDate())+"/"+pad(estDate.getMonth()+1),color:dc};
+        }
+        return null;
       }
 
       var totalConsumed=0; consumptions.forEach(function(c){totalConsumed+=c.amount});
@@ -477,23 +448,25 @@
       var dailyUse=totalConsumed/spanDays; if(dailyUse<=0)dailyUse=0.1;
       var daysLeft=Math.round(item.stock/dailyUse);
       var futureDate=new Date(); futureDate.setDate(futureDate.getDate()+daysLeft);
-      var dc=daysLeft<=7?"text-destructive":daysLeft<=21?"text-amber-500":"text-emerald-500";
-      return {title:daysLeft<=0?"Sin stock":daysLeft<=7?"Agotamiento inminente":daysLeft<=21?"Stock limitado":"Stock holgado",subtitle:"Basado en historial",days:String(daysLeft),dailyUse:dailyUse<1?dailyUse.toFixed(1):Math.round(dailyUse).toString(),dateOut:pad(futureDate.getDate())+"/"+pad(futureDate.getMonth()+1),color:dc};
+      var dc=daysLeft<=7?"text-m3-error":daysLeft<=21?"text-m3-warning":"text-m3-success";
+      
+      var types={}; consumptions.forEach(function(c){types[c.tp]=(types[c.tp]||0)+1});
+      var desc=[]; if(types["salida"])desc.push(types["salida"]+" salidas"); if(types["ajuste"])desc.push(types["ajuste"]+" ajustes");
+      var sub="Basado en "+(desc.length?desc.join(" + "):consumptions.length+" mov.");
+
+      return {title:daysLeft<=0?"Sin stock":daysLeft<=7?"Agotamiento inminente":daysLeft<=21?"Stock limitado":"Stock holgado",subtitle:sub,days:String(daysLeft),dailyUse:dailyUse<1?dailyUse.toFixed(1):Math.round(dailyUse).toString(),dateOut:pad(futureDate.getDate())+"/"+pad(futureDate.getMonth()+1),color:dc};
     }
 
     const app = {
-      state: { users: [], items: [], hist: [], user: null, tab: 'home', selCat: null, selSubcat: null, selItem: null, adjMode: null, q: '' },
+      state: {
+        users: [], items: [], hist: [], user: null, tab: 'home', 
+        selCat: null, selSubcat: null, selItem: null, adjMode: null, q: ''
+      },
 
       init() {
         this.bindEvents();
         this.loadLocal();
         this.syncBackground();
-        lucide.createIcons();
-      },
-
-      injectHTML(id, html) {
-        document.getElementById(id).innerHTML = html;
-        lucide.createIcons({ root: document.getElementById(id) });
       },
 
       loadLocal() {
@@ -505,13 +478,17 @@
           if (u) this.state.users = u;
         } catch(e) { this.state.items = FALLBACK_ITEMS; }
       },
-      saveLocal() { localStorage.setItem('kawas_pro_data', JSON.stringify({items: this.state.items, hist: this.state.hist})); },
+      saveLocal() {
+        localStorage.setItem('kawas_pro_data', JSON.stringify({items: this.state.items, hist: this.state.hist}));
+      },
 
       async fetchAPI(action, opts = {}) {
-        const url = new URL(API_URL); url.searchParams.append('action', action);
+        const url = new URL(API_URL); 
+        url.searchParams.append('action', action);
         Object.keys(opts).forEach(k => url.searchParams.append(k, opts[k]));
         const res = await fetch(url.toString(), { redirect: 'follow' });
-        if(!res.ok) throw new Error("HTTP"); return await res.json();
+        if(!res.ok) throw new Error("HTTP " + res.status);
+        return await res.json();
       },
       async postAPI(body) {
         const res = await fetch(API_URL, { method: 'POST', headers: {'Content-Type': 'text/plain'}, body: JSON.stringify(body), redirect: 'follow' });
@@ -525,55 +502,81 @@
           if(res.success && res.users) {
             this.state.users = res.users.map(u => ({n: u.nombre, p: u.pin}));
             localStorage.setItem('kawas_pro_users', JSON.stringify(this.state.users));
-            document.getElementById('login-hint').textContent = 'Base de datos lista. Ingresa PIN.';
+            document.getElementById('login-hint').textContent = 'Usuarios sincronizados. Ingresa tu PIN.';
           }
         } catch(e) {
           if(!this.state.users.length) this.state.users = FALLBACK_USERS;
-          document.getElementById('login-hint').textContent = 'Modo local activo. Ingresa PIN.';
+          document.getElementById('login-hint').textContent = 'Modo offline local. Ingresa tu PIN.';
         }
+        
         document.getElementById('inp-pin').disabled = false;
         document.getElementById('inp-pin').focus();
         this.renderLoginPills();
       },
 
       async sync(manual = false) {
-        if(manual) { this.toast("Sincronizando..."); document.getElementById('sync-icon').classList.add('animate-spin'); }
+        if(manual) { this.toast("Sincronizando...", "ok"); document.getElementById('sync-icon').classList.add('animate-spin'); }
         try {
           const [iRes, hRes] = await Promise.all([
             this.fetchAPI('getAll').catch(e => ({error: true})), 
             this.fetchAPI('getHistory', {limit: 100}).catch(e => ({error: true}))
           ]);
-          if(iRes && iRes.success && iRes.items) { this.state.items = iRes.items.map(x => ({id: String(x.id), cat: String(x.categoria), subcat: String(x.subcategoria||''), name: String(x.nombre), stock: Number(x.stock)||0, min: Number(x.minimo)||0, unit: String(x.unidad)||'uds', alert: String(x.alerta)||''})); }
-          if(hRes && hRes.success && hRes.entries) { this.state.hist = hRes.entries.map(x => ({id: String(x.itemId), nm: String(x.itemNombre), cat: String(x.categoria), tp: String(x.tipo), os: Number(x.stockAnterior)||0, ns: Number(x.stockNuevo)||0, nt: String(x.nota)||'', u: String(x.usuario)||'?', ts: x.timestamp?x.timestamp.substring(0,16).replace('T',' '):''})); }
-          this.saveLocal(); this.renderAll();
-          if(manual) this.toast("Sincronización completa", "success");
-        } catch(e) { if(manual) this.toast("Error de red.", "destructive"); } 
-        finally { if(manual) document.getElementById('sync-icon').classList.remove('animate-spin'); }
+
+          if(iRes && iRes.success && iRes.items) {
+            this.state.items = iRes.items.map(x => ({id: String(x.id), cat: String(x.categoria), subcat: String(x.subcategoria||''), name: String(x.nombre), stock: Number(x.stock)||0, min: Number(x.minimo)||0, unit: String(x.unidad)||'uds', alert: String(x.alerta)||''}));
+          }
+          if(hRes && hRes.success && hRes.entries) {
+            this.state.hist = hRes.entries.map(x => ({id: String(x.itemId), nm: String(x.itemNombre), cat: String(x.categoria), tp: String(x.tipo), os: Number(x.stockAnterior)||0, ns: Number(x.stockNuevo)||0, nt: String(x.nota)||'', u: String(x.usuario)||'?', ts: x.timestamp?x.timestamp.substring(0,16).replace('T',' '):''}));
+          }
+          
+          this.saveLocal();
+          this.renderAll();
+          if(manual) this.toast("Sincronización completa", "ok");
+        } catch(e) {
+          if(manual) this.toast("Error de red. Mostrando datos locales.", "error");
+        } finally {
+          if(manual) document.getElementById('sync-icon').classList.remove('animate-spin');
+        }
       },
 
       bindEvents() {
         const pin = document.getElementById('inp-pin');
         pin.addEventListener('input', (e) => { if(e.target.value.length === 4) this.attemptLogin(e.target.value); });
+        
         document.querySelectorAll('.nav-btn').forEach(btn => btn.addEventListener('click', () => this.switchTab(btn.dataset.tab)));
+        
         const searchInp = document.getElementById('inp-search');
         searchInp.addEventListener('input', (e) => { this.state.q = e.target.value.toLowerCase(); this.renderSearch(); });
         document.getElementById('btn-clear-search').addEventListener('click', () => { searchInp.value = ''; searchInp.dispatchEvent(new Event('input')); });
+
+        let tX = 0;
+        document.getElementById('main-content').addEventListener('touchstart', e => tX = e.changedTouches[0].screenX, {passive: true});
+        document.getElementById('main-content').addEventListener('touchend', e => {
+          const diff = e.changedTouches[0].screenX - tX;
+          const tabs = ['home', 'search', 'alerts', 'history', 'report'];
+          const idx = tabs.indexOf(this.state.tab);
+          if (Math.abs(diff) > 80) {
+            if (diff < 0 && idx < tabs.length - 1) this.switchTab(tabs[idx + 1]);
+            else if (diff > 0 && idx > 0) this.switchTab(tabs[idx - 1]);
+          }
+        }, {passive: true});
       },
 
       renderLoginPills() {
-        this.injectHTML('login-pills', this.state.users.map(u => `<span class="badge font-normal text-muted-foreground border-input bg-muted/50">${escapeHTML(u.n)}</span>`).join(''));
+        document.getElementById('login-pills').innerHTML = this.state.users.map(u => `<span class="bg-m3-surfaceContainer text-m3-onSurfaceVariant px-3 py-1 rounded-full text-xs font-medium border border-m3-outline/20 shadow-sm">${escapeHTML(u.n)}</span>`).join('');
       },
 
       attemptLogin(pin) {
         const u = this.state.users.find(x => x.p === pin);
         if(u) {
           this.state.user = u;
-          document.getElementById('desktop-user').textContent = u.n;
+          document.getElementById('home-user').innerHTML = `<span class="material-symbols-rounded text-[14px]">person</span> ${u.n}`;
           document.getElementById('view-login').style.opacity = '0';
           setTimeout(() => {
             document.getElementById('view-login').classList.add('hidden');
             document.getElementById('app-shell').classList.remove('hidden');
-            this.sync(); this.renderAll();
+            this.sync(); 
+            this.renderAll();
           }, 300);
         } else {
           document.getElementById('login-error').style.opacity = '1';
@@ -584,58 +587,58 @@
 
       switchTab(tId) {
         if(this.state.tab === tId) return;
-        document.querySelectorAll('.nav-btn').forEach(b => {
-          if(b.dataset.tab === tId) { b.classList.add('text-foreground', 'bg-muted'); b.classList.remove('text-muted-foreground'); }
-          else { b.classList.remove('text-foreground', 'bg-muted'); b.classList.add('text-muted-foreground'); }
-        });
+        document.querySelectorAll('.nav-btn').forEach(b => b.classList.toggle('active', b.dataset.tab === tId));
         ['home', 'search', 'alerts', 'history', 'report'].forEach(id => document.getElementById(`tab-${id}`).classList.add('hidden'));
         document.getElementById(`tab-${tId}`).classList.remove('hidden');
-        const titles = { home: 'Dashboard', search: 'Búsqueda', alerts: 'Alertas', history: 'Historial', report: 'Reportes' };
+        
+        const titles = { home: 'Resumen', search: 'Buscar', alerts: 'Alertas', history: 'Historial', report: 'Reporte PDF' };
+        const icons = { home: 'inventory_2', search: 'search', alerts: 'warning', history: 'history', report: 'description' };
         document.getElementById('header-title').textContent = titles[tId];
+        document.getElementById('header-icon').textContent = icons[tId];
+        
         this.state.tab = tId;
         if(tId === 'search') setTimeout(() => document.getElementById('inp-search').focus(), 100);
       },
 
-      getCatUI(cat) { return CC_KNOWN[cat] || {i:'shapes'}; },
+      getCatUI(cat) { return CC_KNOWN[cat] || {i:'category', c:'text-m3-primary', b:'bg-m3-primaryContainer'}; },
       
-      createListItem(it) {
-        const ui = STC[st(it)]; const sub = it.subcat ? ` • ${escapeHTML(it.subcat)}` : '';
+      createListItem(it, idx, isGrid = false) {
+        const ui = STC[st(it)];
+        const sub = it.subcat ? ` • ${escapeHTML(it.subcat)}` : '';
         const pct = it.min > 0 ? Math.min(100, Math.round((it.stock/it.min)*100)) : 100;
-        const barColor = st(it)==='ok'?'bg-emerald-500':st(it)==='low'?'bg-amber-500':'bg-destructive';
+        const barColor = st(it)==='ok'?'bg-m3-success':st(it)==='low'?'bg-m3-warning':'bg-m3-error';
         return `
-          <div onclick="app.openOverlay('item', '${it.id}')" class="flex flex-col p-4 hover:bg-muted/50 cursor-pointer transition-colors group">
-            <div class="flex justify-between items-start mb-2">
-              <div class="flex-1 min-w-0 pr-4">
-                <h4 class="text-sm font-semibold truncate group-hover:underline underline-offset-4">${escapeHTML(it.name)}</h4>
-                <p class="text-xs text-muted-foreground truncate">${escapeHTML(it.cat)}${sub}</p>
+          <div onclick="app.openOverlay('item', '${it.id}')" class="bg-m3-surfaceContainerLow rounded-2xl p-4 active:scale-95 transition-transform cursor-pointer shadow-sm stagger-item flex flex-col justify-between" style="animation-delay: ${idx * 0.03}s">
+            <div class="flex items-start justify-between gap-2 mb-3">
+              <div class="flex-1 min-w-0">
+                <h3 class="text-base font-medium text-m3-onSurface leading-tight truncate">${escapeHTML(it.name)}</h3>
+                <p class="text-[11px] text-m3-onSurfaceVariant truncate mt-0.5">${escapeHTML(it.cat)}${sub}</p>
               </div>
               <div class="text-right shrink-0">
-                <p class="text-lg font-bold font-mono leading-none">${it.stock}</p>
-                <p class="text-[10px] text-muted-foreground">${escapeHTML(it.unit)}</p>
+                <div class="text-xl font-mono font-medium text-m3-onSurface leading-none">${it.stock}</div>
+                <div class="text-[10px] text-m3-onSurfaceVariant">${escapeHTML(it.unit)}</div>
               </div>
             </div>
-            <div class="flex items-center gap-3">
-              <span class="badge ${ui.c}"><i data-lucide="${ui.i}" class="w-3 h-3 mr-1"></i>${ui.l}</span>
-              <div class="flex-1 h-1.5 bg-secondary rounded-full overflow-hidden"><div class="h-full ${barColor}" style="width: ${pct}%"></div></div>
+            <div class="flex items-center gap-2 mt-auto">
+              <span class="inline-flex items-center gap-1 ${ui.b} ${ui.c} px-2 py-0.5 rounded-full text-[10px] font-medium"><span class="material-symbols-rounded text-[12px]">${ui.i}</span>${ui.l}</span>
+              <div class="flex-1 h-1 bg-m3-surfaceContainerHighest rounded-full overflow-hidden"><div class="h-full ${barColor}" style="width: ${pct}%"></div></div>
             </div>
           </div>
         `;
       },
 
-      createHistoryItem(h) {
+      createHistoryItem(h, idx) {
         const isAdd = h.ns > h.os, isSub = h.ns < h.os;
-        const color = isAdd ? 'text-emerald-600 bg-emerald-500/10' : (isSub ? 'text-destructive bg-destructive/10' : 'text-amber-600 bg-amber-500/10');
-        const icon = isAdd ? 'plus' : (isSub ? 'minus' : 'edit-2');
+        const icon = isAdd ? 'add' : (isSub ? 'remove' : 'edit');
+        const color = isAdd ? 'text-m3-success bg-m3-successContainer' : (isSub ? 'text-m3-error bg-m3-errorContainer' : 'text-m3-warning bg-m3-warningContainer');
         return `
-          <div class="flex items-center justify-between p-4 hover:bg-muted/50 transition-colors">
-            <div class="flex items-center gap-3 min-w-0">
-              <div class="w-8 h-8 rounded-md flex items-center justify-center shrink-0 ${color}"><i data-lucide="${icon}" class="w-4 h-4"></i></div>
-              <div class="min-w-0">
-                <p class="text-sm font-medium truncate">${escapeHTML(h.nm)}</p>
-                <p class="text-xs text-muted-foreground truncate">${escapeHTML(h.u)} • ${escapeHTML(h.ts)}</p>
-              </div>
+          <div class="flex items-center gap-3 py-3 px-2 border-b border-m3-surfaceVariant last:border-0 stagger-item" style="animation-delay: ${idx * 0.01}s">
+            <div class="w-10 h-10 rounded-full flex items-center justify-center shrink-0 ${color}"><span class="material-symbols-rounded text-[20px]">${icon}</span></div>
+            <div class="flex-1 min-w-0">
+              <h3 class="text-sm font-medium text-m3-onSurface truncate">${escapeHTML(h.nm)}</h3>
+              <p class="text-xs text-m3-onSurfaceVariant truncate">${escapeHTML(h.u)} • ${escapeHTML(h.ts)}</p>
             </div>
-            <div class="text-sm font-mono font-bold shrink-0 ml-4">${h.os} &rarr; ${h.ns}</div>
+            <div class="text-right shrink-0"><div class="text-sm font-mono font-bold text-m3-onSurface">${h.os} &rarr; ${h.ns}</div></div>
           </div>
         `;
       },
@@ -652,8 +655,11 @@
         const cats = {}; let tStock = 0; let kOk = 0; let kLow = 0; let kCrit = 0;
         this.state.items.forEach(it => {
           if(!cats[it.cat]) cats[it.cat] = { count: 0, issues: 0 };
-          cats[it.cat].count++; tStock += it.stock;
-          const s = st(it); if(['zero', 'crit'].includes(s)) { cats[it.cat].issues++; kCrit++; } else if(s === 'low') kLow++; else kOk++;
+          cats[it.cat].count++;
+          tStock += it.stock;
+          const s = st(it);
+          if(['zero', 'crit'].includes(s)) { cats[it.cat].issues++; kCrit++; }
+          else if(s === 'low') kLow++; else kOk++;
         });
 
         document.getElementById('home-total-stock').textContent = tStock.toLocaleString();
@@ -661,160 +667,132 @@
         document.getElementById('home-kpi-low').textContent = kLow;
         document.getElementById('home-kpi-crit').textContent = kCrit;
 
-        const html = Object.keys(cats).map((cat) => {
+        const html = Object.keys(cats).map((cat, i) => {
           const ui = this.getCatUI(cat); const c = cats[cat];
-          const badge = c.issues > 0 ? `<span class="absolute top-2 right-2 flex h-2 w-2 rounded-full bg-destructive"></span>` : '';
+          const badge = c.issues > 0 ? `<div class="absolute top-3 right-3 w-5 h-5 bg-m3-error text-m3-onError flex items-center justify-center rounded-full text-[10px] font-bold">${c.issues}</div>` : '';
           return `
-            <div onclick="app.openOverlay('category', '${escapeHTML(cat)}')" class="card p-4 hover:border-primary/50 cursor-pointer transition-all relative flex flex-col justify-between">
+            <div onclick="app.openOverlay('category', '${escapeHTML(cat)}')" class="bg-m3-surfaceContainerHighest rounded-3xl p-4 md:p-5 relative active:scale-95 hover:shadow-md transition-all cursor-pointer stagger-item" style="animation-delay: ${i * 0.04}s">
+              <div class="${ui.c} ${ui.b} w-12 h-12 md:w-14 md:h-14 rounded-full flex items-center justify-center mb-3"><span class="material-symbols-rounded text-[24px] md:text-[28px]">${ui.i}</span></div>
+              <h3 class="font-medium text-m3-onSurface text-[14px] md:text-[16px] leading-tight mb-0.5 md:mb-1">${escapeHTML(cat)}</h3>
+              <p class="text-[11px] md:text-[12px] text-m3-onSurfaceVariant">${c.count} items</p>
               ${badge}
-              <div class="w-10 h-10 rounded-md bg-secondary text-secondary-foreground flex items-center justify-center mb-4"><i data-lucide="${ui.i}" class="w-5 h-5"></i></div>
-              <div>
-                <h3 class="font-semibold text-sm leading-tight tracking-tight">${escapeHTML(cat)}</h3>
-                <p class="text-xs text-muted-foreground mt-1">${c.count} productos</p>
-              </div>
             </div>
           `;
         }).join('');
-        this.injectHTML('home-categories', html);
+        document.getElementById('home-categories').innerHTML = html;
       },
 
       renderSearch() {
+        const box = document.getElementById('search-results');
         document.getElementById('btn-clear-search').classList.toggle('hidden', this.state.q === '');
-        if(!this.state.q) { this.injectHTML('search-results', ''); return; }
+        if(!this.state.q) { box.innerHTML = ''; return; }
         const res = this.state.items.filter(it => it.name.toLowerCase().includes(this.state.q));
-        this.injectHTML('search-results', res.map(it => this.createListItem(it)).join(''));
+        box.innerHTML = res.map((it, i) => this.createListItem(it, i)).join('');
       },
 
       renderAlerts() {
         const alerts = this.state.items.filter(it => ['zero','crit','low'].includes(st(it))).sort((a,b) => STC[st(a)].v - STC[st(b)].v);
         const cCount = alerts.filter(a => ['zero','crit'].includes(st(a))).length;
-        document.getElementById('badge-alerts-mobile').classList.toggle('hidden', cCount === 0);
-        document.getElementById('badge-alerts-desktop').classList.toggle('hidden', cCount === 0);
+        document.getElementById('badge-alerts').classList.toggle('hidden', cCount === 0);
         
         if(this.state.tab !== 'alerts') return;
-        if(!alerts.length) { this.injectHTML('alerts-list', `<div class="p-8 text-center text-muted-foreground"><i data-lucide="check-circle" class="w-10 h-10 mx-auto mb-2 opacity-50"></i><p class="text-sm">Todo en orden.</p></div>`); return; }
-        this.injectHTML('alerts-list', alerts.map(it => this.createListItem(it)).join(''));
+        if(!alerts.length) { document.getElementById('alerts-list').innerHTML = `<div class="text-center py-10 text-m3-onSurfaceVariant col-span-full"><span class="material-symbols-rounded text-6xl opacity-50 mb-4">check_circle</span><p>Todo el stock está en niveles óptimos.</p></div>`; return; }
+        document.getElementById('alerts-list').innerHTML = alerts.map((it, i) => this.createListItem(it, i)).join('');
       },
 
       renderHistory() {
-        if(!this.state.hist.length) { this.injectHTML('history-list', `<div class="p-8 text-center text-muted-foreground"><i data-lucide="clock" class="w-10 h-10 mx-auto mb-2 opacity-50"></i><p class="text-sm">Sin historial.</p></div>`); return; }
-        this.injectHTML('history-list', this.state.hist.slice(0, 50).map(h => this.createHistoryItem(h)).join(''));
+        if(!this.state.hist.length) { document.getElementById('history-list').innerHTML = '<div class="text-center py-10 text-m3-onSurfaceVariant">Sin movimientos recientes</div>'; return; }
+        document.getElementById('history-list').innerHTML = this.state.hist.slice(0, 50).map((h, i) => this.createHistoryItem(h, i)).join('');
       },
 
-      // Overlays tipo shadcn Sheet
       openOverlay(type, id) {
-        document.getElementById('sheet-backdrop').classList.remove('hidden');
-        document.getElementById('sheet-backdrop').setAttribute('data-state', 'open');
-
         if (type === 'category') {
-          this.state.selCat = id; document.getElementById('cat-title').textContent = id;
+          this.state.selCat = id;
+          document.getElementById('cat-title').textContent = id;
+          
           const subs = {}; this.state.items.filter(x => x.cat === id).forEach(x => { const s = x.subcat||'General'; if(!subs[s])subs[s]=[]; subs[s].push(x); });
           const sk = Object.keys(subs);
-          if(sk.length === 1 && sk[0] === 'General') { this.openOverlay('subcat', 'General'); return; } 
-          document.getElementById('cat-subtitle').textContent = `${sk.length} subcategorías`;
           
-          this.injectHTML('cat-list', sk.map(s => {
+          if(sk.length === 1 && sk[0] === 'General') { this.openOverlay('subcat', 'General'); return; } 
+          
+          document.getElementById('cat-subtitle').textContent = `${sk.length} subcategorías`;
+          document.getElementById('cat-list').innerHTML = sk.map((s, i) => {
             const count = subs[s].length; const issues = subs[s].filter(x => st(x)!=='ok').length;
-            const b = issues ? `<span class="badge bg-destructive/10 text-destructive border-destructive/20">${issues} alertas</span>` : `<span class="badge bg-emerald-500/10 text-emerald-600 border-emerald-500/20">OK</span>`;
+            const b = issues ? `<span class="bg-m3-errorContainer text-m3-onErrorContainer px-2 py-0.5 rounded-full text-[10px] font-bold">${issues} alertas</span>` : `<span class="bg-m3-successContainer text-m3-onSuccessContainer px-2 py-0.5 rounded-full text-[10px] font-bold">OK</span>`;
             return `
-              <div onclick="app.openOverlay('subcat', '${escapeHTML(s)}')" class="card p-4 flex items-center justify-between cursor-pointer hover:bg-muted/50 transition-colors">
-                <div><h3 class="font-semibold text-sm">${escapeHTML(s)}</h3><p class="text-xs text-muted-foreground">${count} productos</p></div>${b}
-              </div>`;
-          }).join(''));
-          this.showSheet('view-category');
+              <div onclick="app.openOverlay('subcat', '${escapeHTML(s)}')" class="bg-m3-surfaceContainerHighest rounded-2xl p-4 md:p-6 flex items-center justify-between cursor-pointer active:scale-95 hover:shadow-md transition-all stagger-item" style="animation-delay: ${i*0.03}s">
+                <div><h3 class="font-medium text-m3-onSurface text-base md:text-lg">${escapeHTML(s)}</h3><p class="text-xs text-m3-onSurfaceVariant">${count} productos</p></div>${b}
+              </div>
+            `;
+          }).join('');
+          this.showView('view-category');
         } 
         else if (type === 'subcat') {
           this.state.selSubcat = id;
-          document.getElementById('subcat-title').textContent = id; document.getElementById('subcat-subtitle').textContent = this.state.selCat;
+          document.getElementById('subcat-title').textContent = id;
+          document.getElementById('subcat-subtitle').textContent = this.state.selCat;
           const its = this.state.items.filter(x => x.cat === this.state.selCat && (x.subcat||'General') === id).sort((a,b) => STC[st(a)].v - STC[st(b)].v);
-          this.injectHTML('subcat-list', its.map(it => this.createListItem(it)).join(''));
-          this.showSheet('view-subcat');
+          document.getElementById('subcat-list').innerHTML = its.map((it, i) => this.createListItem(it, i, true)).join('');
+          this.showView('view-subcat');
         }
         else if (type === 'item') {
           const it = this.state.items.find(x => x.id === id); if(!it) return;
           this.state.selItem = it;
-          document.getElementById('item-title').textContent = it.name; document.getElementById('item-subtitle').textContent = `${it.cat}${it.subcat?` • ${it.subcat}`:''}`;
-          document.getElementById('item-stock').textContent = it.stock; document.getElementById('item-unit').textContent = `uds`;
-          document.getElementById('item-min').textContent = it.min;
+          document.getElementById('item-title').textContent = it.name;
+          document.getElementById('item-subtitle').textContent = `${it.cat}${it.subcat?` • ${it.subcat}`:''}`;
+          document.getElementById('item-stock').textContent = it.stock;
+          document.getElementById('item-unit').textContent = `${it.unit} disp.`;
+          document.getElementById('item-min').textContent = `${it.min} ${it.unit}`;
           
           const ui = STC[st(it)];
-          const bgStatus = st(it)==='ok'?'bg-emerald-500':st(it)==='low'?'bg-amber-500':'bg-destructive';
-          document.getElementById('item-status-bg').className = `absolute top-0 left-0 w-full h-1.5 ${bgStatus}`;
-          document.getElementById('item-status-chip').className = `badge ${ui.c}`;
-          this.injectHTML('item-status-chip', `<i data-lucide="${ui.i}" class="w-3 h-3 mr-1"></i> ${ui.l}`);
-          
+          document.getElementById('item-status-chip').className = `inline-flex items-center gap-1.5 px-4 md:px-6 py-1.5 md:py-2 rounded-full text-sm md:text-base font-medium ${ui.b} ${ui.c}`;
+          document.getElementById('item-status-chip').innerHTML = `<span class="material-symbols-rounded text-base">${ui.i}</span> ${ui.l}`;
           document.getElementById('item-progress').style.width = `${it.min>0?Math.min(100, Math.round(it.stock/it.min*100)):100}%`;
-          document.getElementById('item-progress').className = `h-full transition-all ${bgStatus}`;
+          document.getElementById('item-progress').className = `h-full transition-all ${st(it)==='ok'?'bg-m3-success':st(it)==='low'?'bg-m3-warning':'bg-m3-error'}`;
 
           const p = calcProjection(it);
           const pCard = document.getElementById('item-proj-card');
           if(p) {
             pCard.classList.remove('hidden');
             document.getElementById('proj-title').textContent = p.title; document.getElementById('proj-subtitle').textContent = p.subtitle;
-            document.getElementById('proj-days').textContent = p.days; document.getElementById('proj-days').className = `text-xl font-bold font-mono ${p.color}`;
+            document.getElementById('proj-days').textContent = p.days; document.getElementById('proj-days').className = `text-xl md:text-2xl font-mono ${p.color}`;
             document.getElementById('proj-use').textContent = p.dailyUse; document.getElementById('proj-date').textContent = p.dateOut;
           } else { pCard.classList.add('hidden'); }
 
           const ih = this.state.hist.filter(h => h.id === it.id).slice(0, 15);
-          this.injectHTML('item-history-list', ih.length ? ih.map(h => this.createHistoryItem(h)).join('') : `<p class="text-center text-xs text-muted-foreground py-6">Sin registros</p>`);
-          
-          this.closeAdjust();
-          this.showSheet('view-item');
-        }
-      },
+          document.getElementById('item-history-list').innerHTML = ih.length ? ih.map((h, i) => this.createHistoryItem(h, i)).join('') : `<p class="text-center text-xs text-m3-onSurfaceVariant py-4">Sin registros</p>`;
 
-      showSheet(id) { 
-        const v = document.getElementById(id); v.classList.remove('hidden'); 
-        requestAnimationFrame(() => v.setAttribute('data-state', 'open'));
+          this.closeAdjust();
+          this.showView('view-item');
+        }
       },
 
       closeOverlay(type) {
-        const v = document.getElementById(`view-${type}`); 
-        v.setAttribute('data-state', 'closed');
-        setTimeout(() => { v.classList.add('hidden'); }, 300);
-        
-        if(type === 'item') { 
-          this.state.selItem = null; 
-          if(!this.state.selSubcat && !this.state.selCat) this.hideBackdrop(); 
-        }
-        else if(type === 'subcat') { 
-          this.state.selSubcat = null; 
-          if(!this.state.selCat) this.hideBackdrop(); 
-        }
-        else if(type === 'category') { 
-          this.state.selCat = null; 
-          this.hideBackdrop(); 
-        }
+        const v = document.getElementById(`view-${type}`); v.classList.add('overlay-exit-active');
+        setTimeout(() => { v.classList.remove('overlay-enter-active', 'overlay-exit-active'); v.classList.add('hidden'); }, 300);
+        if(type === 'item') this.state.selItem = null;
+        else if(type === 'subcat') this.state.selSubcat = null;
+        else if(type === 'category') this.state.selCat = null;
       },
-
-      hideBackdrop() {
-        const b = document.getElementById('sheet-backdrop');
-        b.setAttribute('data-state', 'closed');
-        setTimeout(() => b.classList.add('hidden'), 300);
-      },
-      closeAllOverlays() {
-        if(this.state.selItem) this.closeOverlay('item');
-        if(this.state.selSubcat) this.closeOverlay('subcat');
-        if(this.state.selCat) this.closeOverlay('category');
-      },
+      showView(id) { const v = document.getElementById(id); v.classList.remove('hidden'); v.classList.add('overlay-enter-active'); },
 
       openAdjust(mode) {
         this.state.adjMode = mode;
         document.getElementById('item-actions').classList.add('hidden');
         const form = document.getElementById('item-adjust-form');
-        form.classList.remove('hidden'); 
-        document.getElementById('adj-title').textContent = mode==='in'?'Registrar Ingreso':mode==='out'?'Registrar Salida':'Ajuste Manual';
+        form.classList.remove('hidden'); form.classList.add('flex', 'stagger-item');
+        document.getElementById('adj-title').textContent = mode==='in'?'Ingreso':mode==='out'?'Salida':'Ajuste Manual';
         document.getElementById('inp-adj-val').value = ''; document.getElementById('inp-adj-note').value = '';
         setTimeout(() => document.getElementById('inp-adj-val').focus(), 50);
       },
       closeAdjust() {
         this.state.adjMode = null;
-        document.getElementById('item-adjust-form').classList.add('hidden'); 
+        document.getElementById('item-adjust-form').classList.add('hidden'); document.getElementById('item-adjust-form').classList.remove('flex', 'stagger-item');
         document.getElementById('item-actions').classList.remove('hidden');
       },
       async confirmAdjust() {
         const v = parseInt(document.getElementById('inp-adj-val').value);
-        if(isNaN(v) || v < 0) return this.toast("Valor inválido", "destructive");
+        if(isNaN(v) || v < 0) return this.toast("Valor inválido", "error");
         
         const it = this.state.selItem; const old = it.stock; let ns = old;
         if(this.state.adjMode === "in") ns += v; else if(this.state.adjMode === "out") ns = Math.max(0, old - v); else ns = v;
@@ -823,64 +801,45 @@
         it.stock = ns; 
         const tsNow = new Date().toLocaleString('es-CL',{hour:'2-digit',minute:'2-digit',day:'2-digit',month:'2-digit'}).replace(',','');
         this.state.hist.unshift({id:it.id, nm:it.name, cat:it.cat, tp:this.state.adjMode==='in'?'ingreso':this.state.adjMode==='out'?'salida':'ajuste', os:old, ns:ns, nt:note, u:this.state.user.n, ts:tsNow});
-        this.saveLocal(); this.openOverlay('item', it.id); this.renderAll(); this.toast("Guardado local", "default");
+        this.saveLocal(); this.openOverlay('item', it.id); this.renderAll(); this.toast("Guardado localmente", "ok");
 
         try {
           const res = await this.postAPI({ action: "updateStock", itemId: it.id, newStock: ns, oldStock: old, tipo: this.state.adjMode==='in'?'ingreso':this.state.adjMode==='out'?'salida':'ajuste', usuario: this.state.user.n, nota: note });
           if(res.error) throw new Error();
-          this.toast("Sincronizado", "default");
-        } catch(e) { this.toast("Error de Red. Sincronizar luego.", "destructive"); }
+          this.toast("Sincronizado en la Nube", "ok");
+        } catch(e) { this.toast("Error de Red. Sincronizar luego.", "error"); }
       },
 
-      toast(msg, type="default") {
-        const container = document.getElementById('toast-container');
-        const id = 'toast-' + Date.now();
-        const bg = type === 'destructive' ? 'bg-destructive text-destructive-foreground' : 'bg-foreground text-background';
-        const html = `
-          <div id="${id}" class="${bg} rounded-md shadow-lg px-4 py-3 text-sm font-medium transition-all duration-300 translate-y-8 opacity-0 flex items-center justify-between pointer-events-auto min-w-[250px]">
-            <span>${escapeHTML(msg)}</span>
-          </div>
-        `;
-        container.insertAdjacentHTML('beforeend', html);
-        const el = document.getElementById(id);
-        
-        // Animate in
-        requestAnimationFrame(() => {
-          el.classList.remove('translate-y-8', 'opacity-0');
-          el.classList.add('translate-y-0', 'opacity-100');
-        });
-        
-        // Remove after 3s
-        setTimeout(() => {
-          el.classList.remove('translate-y-0', 'opacity-100');
-          el.classList.add('opacity-0');
-          setTimeout(() => el.remove(), 300);
-        }, 3000);
+      toast(msg, type="ok") {
+        const sb = document.getElementById('snackbar'); document.getElementById('sb-text').textContent = msg;
+        const icon = document.getElementById('sb-icon'); icon.textContent = type==='error'?'error':'check_circle';
+        icon.className = `material-symbols-rounded ${type==='error'?'text-m3-errorContainer':'text-m3-successContainer'}`;
+        sb.classList.remove('animate-snackbar'); void sb.offsetWidth; sb.classList.add('animate-snackbar');
       },
 
       generatePDF() {
-        this.toast('Generando PDF...', 'default');
+        this.toast('Generando PDF...');
         setTimeout(() => {
           const ds = new Date().toLocaleDateString('es-CL');
           const tS = this.state.items.reduce((acc, x) => acc + x.stock, 0);
           const cC = this.state.items.filter(x => ['zero','crit'].includes(st(x))).length;
           
-          let h = `<!DOCTYPE html><html><head><meta charset="UTF-8"><title>Kawas Stock</title><style>body{font-family:Inter,sans-serif;color:#09090b;font-size:12px;padding:30px}table{width:100%;border-collapse:collapse;margin-bottom:24px}th,td{padding:10px;border-bottom:1px solid #e4e4e7;text-align:left}th{font-weight:600;color:#71717a} .danger{color:#ef4444} .warn{color:#f59e0b} h2{font-size:20px;font-weight:700;margin-bottom:4px} h3{font-size:14px;font-weight:600;margin-top:24px;margin-bottom:8px}</style></head><body>`;
-          h += `<h2>Reporte de Stock Kawas</h2><p style="color:#71717a;margin-bottom:24px">Generado el ${ds} | Total Items: ${this.state.items.length} | Stock Total: ${tS} | Alertas: <span class="danger">${cC}</span></p>`;
+          let h = `<!DOCTYPE html><html><head><meta charset="UTF-8"><title>Kawas Stock</title><style>body{font-family:sans-serif;color:#1A1C1E;font-size:12px;padding:20px}table{width:100%;border-collapse:collapse;margin-bottom:20px}th,td{padding:8px;border-bottom:1px solid #E2E2E5;text-align:left}th{background:#F4F3F7;font-weight:bold} .danger{color:#BA1A1A} .warn{color:#825500}</style></head><body>`;
+          h += `<h2>Reporte de Stock Kawas - ${ds}</h2><p>Total Items: ${this.state.items.length} | Stock Total: ${tS} | Críticos: <span class="danger">${cC}</span></p>`;
           
           const crit = this.state.items.filter(x => st(x)!=='ok').sort((a,b)=>a.stock-b.stock);
           if(crit.length) {
             h += `<h3>Alertas Activas</h3><table><tr><th>Producto</th><th>Stock</th><th>Min</th><th>Estado</th></tr>`;
-            crit.forEach(it => h += `<tr><td>${it.name} <br><span style="color:#71717a;font-size:10px">${it.cat}</span></td><td><b>${it.stock}</b></td><td>${it.min}</td><td class="${st(it)==='low'?'warn':'danger'}">${STC[st(it)].l}</td></tr>`);
+            crit.forEach(it => h += `<tr><td>${it.name} <br><small>${it.cat}</small></td><td><b>${it.stock}</b></td><td>${it.min}</td><td class="${st(it)==='low'?'warn':'danger'}">${STC[st(it)].l}</td></tr>`);
             h += `</table>`;
           }
           
           h += `<h3>Inventario Completo</h3><table><tr><th>Producto</th><th>Categoría</th><th>Stock</th></tr>`;
-          this.state.items.sort((a,b)=>a.cat.localeCompare(b.cat)).forEach(it => h += `<tr><td>${it.name}</td><td style="color:#71717a">${it.cat}</td><td>${it.stock}</td></tr>`);
+          this.state.items.sort((a,b)=>a.cat.localeCompare(b.cat)).forEach(it => h += `<tr><td>${it.name}</td><td>${it.cat}</td><td>${it.stock}</td></tr>`);
           h += `</table></body></html>`;
 
           const blob = new Blob([h],{type:'text/html'}); const url = URL.createObjectURL(blob);
-          const a = document.createElement('a'); a.href = url; a.download = `Kawas_Stock_${ds.replace(/\//g,'')}.html`; a.click();
+          const a = document.createElement('a'); a.href = url; a.download = `Reporte_Kawas_${ds.replace(/\//g,'')}.html`; a.click();
           this.toast('Reporte descargado (Ábrelo y guarda como PDF)');
         }, 300);
       }
