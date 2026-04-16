@@ -9,9 +9,9 @@
   <meta name="theme-color" content="#FAF9FD">
   <title>Kawas Stock Pro</title>
 
-  <!-- Google Fonts & Material Symbols -->
+  <!-- Google Fonts & Material Symbols (Estricto M3) -->
   <link href="https://fonts.googleapis.com/css2?family=Google+Sans:wght@400;500;700&family=Roboto:wght@400;500;700&family=Roboto+Mono:wght@400;500;700&display=swap" rel="stylesheet">
-  <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@20..48,400..600,0..1,0" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" rel="stylesheet" />
 
   <!-- Tailwind CSS -->
   <script src="https://cdn.tailwindcss.com"></script>
@@ -69,7 +69,23 @@
     .no-scrollbar::-webkit-scrollbar { display: none; }
     .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
     
-    .icon-fill { font-variation-settings: 'FILL' 1; }
+    /* Reglas estrictas de Iconos M3 */
+    .material-symbols-rounded { 
+      font-family: 'Material Symbols Rounded' !important;
+      font-weight: normal;
+      font-style: normal;
+      font-size: 24px;
+      display: inline-block; 
+      line-height: 1;
+      text-transform: none;
+      letter-spacing: normal;
+      word-wrap: normal;
+      white-space: nowrap;
+      direction: ltr;
+      -webkit-font-smoothing: antialiased;
+      font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24; 
+    }
+    .icon-fill { font-variation-settings: 'FILL' 1, 'wght' 400, 'GRAD' 0, 'opsz' 24 !important; }
     
     /* Transiciones de Overlays */
     .overlay-enter { transform: translateX(100%); opacity: 0; }
@@ -108,11 +124,10 @@
     </div>
   </div>
 
-  <!-- ==================== APP SHELL RESPONSIVO (Móvil & Escritorio) ==================== -->
-  <!-- En móvil: flex-col (nav abajo). En Escritorio: flex-row (nav a la izquierda) -->
+  <!-- ==================== APP SHELL RESPONSIVO ==================== -->
   <div id="app-shell" class="w-full h-full flex flex-col md:flex-row relative hidden bg-m3-surface">
     
-    <!-- NAVIGATION: Bottom Nav (Mobile) -> Navigation Rail (Desktop) -->
+    <!-- NAVIGATION RAIL / BOTTOM NAV -->
     <nav class="order-last md:order-first h-20 md:h-full md:w-[96px] bg-m3-surfaceContainer md:bg-m3-surface grid grid-cols-5 md:flex md:flex-col md:justify-start md:pt-6 md:gap-4 pb-[env(safe-area-inset-bottom)] shrink-0 z-20 shadow-[0_-1px_3px_rgba(0,0,0,0.05)] md:shadow-none md:border-r md:border-m3-surfaceVariant">
       <button class="nav-btn flex flex-col items-center justify-center gap-1 md:gap-1.5 text-m3-onSurfaceVariant group active w-full md:py-2" data-tab="home">
         <div class="w-14 h-8 md:w-14 md:h-10 rounded-full flex items-center justify-center indicator group-[.active]:bg-m3-secondaryContainer group-[.active]:text-m3-onSecondaryContainer transition-colors">
@@ -147,7 +162,7 @@
       </button>
     </nav>
 
-    <!-- ÁREA DERECHA: Contiene el Header, Main Content y los Overlays -->
+    <!-- ÁREA DERECHA -->
     <div class="flex-1 flex flex-col relative min-w-0 overflow-hidden bg-m3-surface">
       
       <!-- Top App Bar -->
@@ -164,7 +179,7 @@
         </button>
       </header>
 
-      <!-- Contenedor Principal de Vistas -->
+      <!-- Contenedor Principal -->
       <main id="main-content" class="flex-1 overflow-y-auto overflow-x-hidden relative no-scrollbar pb-6 px-4 md:px-8">
         
         <!-- Tab 1: Inicio -->
@@ -178,19 +193,19 @@
               <div id="home-total-stock" class="text-5xl md:text-7xl font-light text-m3-onSurface font-mono tracking-tight mb-4 md:mb-0">0</div>
             </div>
             <div class="grid grid-cols-3 gap-3 md:gap-6 md:w-1/2">
-              <div class="bg-m3-surfaceContainer px-3 py-2 md:p-4 rounded-2xl md:rounded-3xl">
+              <!-- KPIs navegables (con hover y cursor-pointer) -->
+              <div onclick="app.switchTab('home')" class="bg-m3-surfaceContainer px-3 py-2 md:p-4 rounded-2xl md:rounded-3xl cursor-pointer active:scale-95 hover:bg-m3-surfaceContainerHigh transition-all">
                 <div id="home-kpi-ok" class="text-xl md:text-3xl font-medium text-m3-success font-mono">0</div><div class="text-[10px] md:text-xs text-m3-onSurfaceVariant uppercase mt-1">Óptimos</div>
               </div>
-              <div class="bg-m3-surfaceContainer px-3 py-2 md:p-4 rounded-2xl md:rounded-3xl">
+              <div onclick="app.switchTab('alerts')" class="bg-m3-surfaceContainer px-3 py-2 md:p-4 rounded-2xl md:rounded-3xl cursor-pointer active:scale-95 hover:bg-m3-surfaceContainerHigh transition-all">
                 <div id="home-kpi-low" class="text-xl md:text-3xl font-medium text-m3-warning font-mono">0</div><div class="text-[10px] md:text-xs text-m3-onSurfaceVariant uppercase mt-1">Bajos</div>
               </div>
-              <div class="bg-m3-surfaceContainer px-3 py-2 md:p-4 rounded-2xl md:rounded-3xl">
+              <div onclick="app.switchTab('alerts')" class="bg-m3-surfaceContainer px-3 py-2 md:p-4 rounded-2xl md:rounded-3xl cursor-pointer active:scale-95 hover:bg-m3-surfaceContainerHigh transition-all">
                 <div id="home-kpi-crit" class="text-xl md:text-3xl font-medium text-m3-error font-mono">0</div><div class="text-[10px] md:text-xs text-m3-onSurfaceVariant uppercase mt-1">Críticos</div>
               </div>
             </div>
           </div>
           <div class="text-sm font-medium text-m3-onSurfaceVariant tracking-wider uppercase mb-3 px-1">Categorías</div>
-          <!-- Grid Responsivo -->
           <div id="home-categories" class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3 md:gap-4"></div>
         </section>
 
@@ -201,7 +216,6 @@
             <input id="inp-search" type="text" placeholder="Buscar producto..." class="flex-1 bg-transparent outline-none text-m3-onSurface text-base">
             <button id="btn-clear-search" class="hidden text-m3-onSurfaceVariant"><span class="material-symbols-rounded text-xl">close</span></button>
           </div>
-          <!-- La búsqueda en desktop se mostrará en 2 o 3 columnas -->
           <div id="search-results" class="flex flex-col md:grid md:grid-cols-2 lg:grid-cols-3 md:gap-4"></div>
         </section>
 
@@ -234,7 +248,7 @@
 
       </main>
 
-      <!-- ==================== OVERLAYS (Limitados al área derecha en Desktop) ==================== -->
+      <!-- ==================== OVERLAYS ==================== -->
       
       <!-- Overlay: Categoría / Subcategorías -->
       <div id="view-category" class="absolute inset-0 z-30 bg-m3-surface w-full flex flex-col overlay-enter hidden">
@@ -277,7 +291,6 @@
         </header>
         <main class="flex-1 overflow-y-auto no-scrollbar px-4 md:px-8 pb-8 flex flex-col items-center">
           
-          <!-- Contenedor centralizado para Escritorio -->
           <div class="w-full max-w-3xl">
             <!-- Tarjeta Stock -->
             <div class="bg-m3-surfaceContainerLow rounded-3xl p-6 md:p-8 text-center border-t-4 border-m3-primary mb-4 md:mb-6 mt-2 md:mt-6 shadow-sm">
@@ -290,16 +303,16 @@
             </div>
 
             <div class="md:grid md:grid-cols-2 md:gap-6">
-              <!-- Columna 1 (Desktop): Proyección & Botones -->
+              <!-- Columna 1 (Desktop) -->
               <div>
-                <!-- Tarjeta Proyección -->
+                <!-- Proyección -->
                 <div id="item-proj-card" class="bg-m3-surfaceContainer rounded-3xl p-5 md:p-6 mb-4 hidden">
                   <div class="flex items-center justify-between mb-4">
                     <div>
                       <div id="proj-title" class="text-sm md:text-base font-medium text-m3-onSurface"></div>
                       <div id="proj-subtitle" class="text-[11px] text-m3-onSurfaceVariant mt-0.5"></div>
                     </div>
-                    <span class="material-symbols-rounded text-m3-primary bg-m3-primaryContainer p-1.5 rounded-full text-[16px] md:text-[20px]">timeline</span>
+                    <span class="material-symbols-rounded text-m3-primary bg-m3-primaryContainer p-1.5 rounded-full text-[16px] md:text-[20px]">insights</span>
                   </div>
                   <div class="grid grid-cols-3 gap-2 text-center">
                     <div><div id="proj-days" class="text-xl md:text-2xl font-mono text-m3-onSurface"></div><div class="text-[10px] md:text-[11px] text-m3-onSurfaceVariant mt-1">Días Rest.</div></div>
@@ -308,7 +321,7 @@
                   </div>
                 </div>
 
-                <!-- Botones Acción -->
+                <!-- Botones -->
                 <div id="item-actions" class="grid grid-cols-3 gap-3 mb-6">
                   <button onclick="app.openAdjust('in')" class="h-20 bg-m3-successContainer text-m3-onSuccessContainer rounded-2xl flex flex-col items-center justify-center gap-1 active:scale-95 hover:brightness-95 transition-all">
                     <span class="material-symbols-rounded">add</span><span class="text-sm font-medium">Ingreso</span>
@@ -339,7 +352,7 @@
                 </div>
               </div>
 
-              <!-- Columna 2 (Desktop): Historial -->
+              <!-- Columna 2 (Desktop) -->
               <div>
                 <div class="text-sm font-medium text-m3-onSurfaceVariant uppercase tracking-wider mb-3 md:mt-0">Historial Reciente</div>
                 <div id="item-history-list" class="flex flex-col md:bg-m3-surfaceContainerLow md:rounded-3xl md:p-4"></div>
@@ -349,10 +362,10 @@
         </main>
       </div>
 
-    </div> <!-- Fin Área Derecha -->
+    </div>
   </div>
 
-  <!-- ==================== SNACKBAR (Toast M3) ==================== -->
+  <!-- ==================== SNACKBAR ==================== -->
   <div id="snackbar" class="fixed bottom-[100px] md:bottom-10 left-1/2 -translate-x-1/2 bg-[#313033] text-[#F4EFF4] px-4 py-3 rounded-xl shadow-lg flex items-center gap-3 text-sm z-[60] opacity-0 pointer-events-none min-w-[300px]">
     <span id="sb-icon" class="material-symbols-rounded text-m3-successContainer">check_circle</span>
     <span id="sb-text" class="flex-1">Mensaje</span>
@@ -360,7 +373,6 @@
 
   <!-- ==================== LÓGICA DE APLICACIÓN ==================== -->
   <script>
-    // --- DATOS Y UTILIDADES PRESERVADAS ---
     let API_URL = "https://script.google.com/macros/s/AKfycbyEc51AIkfpgZzzfv_qHWfkQUObG824eNsg8sCZL0KU8r9k0lhVbx4EKYP1Ktq7Knk_gg/exec";
     const SHEET_URL = "https://docs.google.com/spreadsheets/d/1eF4MZHXzz_UQOvNbni-g0ljoD1fJIeg_QsHG8H6ievo/edit";
     
@@ -458,8 +470,11 @@
         localStorage.setItem('kawas_pro_data', JSON.stringify({items: this.state.items, hist: this.state.hist}));
       },
 
+      /* CORRECCIÓN: Agregando correctamente los parámetros 'opts' a la URL para el Historial */
       async fetchAPI(action, opts = {}) {
-        const url = new URL(API_URL); url.searchParams.append('action', action);
+        const url = new URL(API_URL); 
+        url.searchParams.append('action', action);
+        Object.keys(opts).forEach(k => url.searchParams.append(k, opts[k]));
         const res = await fetch(url.toString(), { redirect: 'follow' });
         if(!res.ok) throw new Error("HTTP " + res.status);
         return await res.json();
@@ -491,13 +506,19 @@
       async sync(manual = false) {
         if(manual) { this.toast("Sincronizando...", "ok"); document.getElementById('sync-icon').classList.add('animate-spin'); }
         try {
-          const [iRes, hRes] = await Promise.all([this.fetchAPI('getAll'), this.fetchAPI('getHistory', {limit: 100})]);
-          if(iRes.success && iRes.items) {
+          /* CORRECCIÓN: Promesas separadas con catch individual para que una no rompa la otra */
+          const [iRes, hRes] = await Promise.all([
+            this.fetchAPI('getAll').catch(e => ({error: true})), 
+            this.fetchAPI('getHistory', {limit: 100}).catch(e => ({error: true}))
+          ]);
+
+          if(iRes && iRes.success && iRes.items) {
             this.state.items = iRes.items.map(x => ({id: String(x.id), cat: String(x.categoria), subcat: String(x.subcategoria||''), name: String(x.nombre), stock: Number(x.stock)||0, min: Number(x.minimo)||0, unit: String(x.unidad)||'uds', alert: String(x.alerta)||''}));
           }
-          if(hRes.success && hRes.entries) {
+          if(hRes && hRes.success && hRes.entries) {
             this.state.hist = hRes.entries.map(x => ({id: String(x.itemId), nm: String(x.itemNombre), cat: String(x.categoria), tp: String(x.tipo), os: Number(x.stockAnterior)||0, ns: Number(x.stockNuevo)||0, nt: String(x.nota)||'', u: String(x.usuario)||'?', ts: x.timestamp?x.timestamp.substring(0,16).replace('T',' '):''}));
           }
+          
           this.saveLocal();
           this.renderAll();
           if(manual) this.toast("Sincronización completa", "ok");
@@ -576,7 +597,6 @@
         const sub = it.subcat ? ` • ${escapeHTML(it.subcat)}` : '';
         const pct = it.min > 0 ? Math.min(100, Math.round((it.stock/it.min)*100)) : 100;
         const barColor = st(it)==='ok'?'bg-m3-success':st(it)==='low'?'bg-m3-warning':'bg-m3-error';
-        // En vistas grid (desktop) la tarjeta se adapta perfecto
         return `
           <div onclick="app.openOverlay('item', '${it.id}')" class="bg-m3-surfaceContainerLow rounded-2xl p-4 active:scale-95 transition-transform cursor-pointer shadow-sm stagger-item flex flex-col justify-between" style="animation-delay: ${idx * 0.03}s">
             <div class="flex items-start justify-between gap-2 mb-3">
