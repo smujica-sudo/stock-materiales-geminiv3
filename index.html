@@ -1,0 +1,2925 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <base target="_top">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
+  <meta name="theme-color" content="#ffffff">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="default">
+  <meta name="mobile-web-app-capable" content="yes">
+  <title>Kawas Control de Stock</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            border: 'hsl(var(--border) / <alpha-value>)',
+            input: 'hsl(var(--input) / <alpha-value>)',
+            ring: 'hsl(var(--ring) / <alpha-value>)',
+            background: 'hsl(var(--background) / <alpha-value>)',
+            foreground: 'hsl(var(--foreground) / <alpha-value>)',
+            primary: { DEFAULT: 'hsl(var(--primary) / <alpha-value>)', foreground: 'hsl(var(--primary-foreground) / <alpha-value>)' },
+            secondary: { DEFAULT: 'hsl(var(--secondary) / <alpha-value>)', foreground: 'hsl(var(--secondary-foreground) / <alpha-value>)' },
+            destructive: { DEFAULT: 'hsl(var(--destructive) / <alpha-value>)', foreground: 'hsl(var(--destructive-foreground) / <alpha-value>)' },
+            muted: { DEFAULT: 'hsl(var(--muted) / <alpha-value>)', foreground: 'hsl(var(--muted-foreground) / <alpha-value>)' },
+            accent: { DEFAULT: 'hsl(var(--accent) / <alpha-value>)', foreground: 'hsl(var(--accent-foreground) / <alpha-value>)' },
+            card: { DEFAULT: 'hsl(var(--card) / <alpha-value>)', foreground: 'hsl(var(--card-foreground) / <alpha-value>)' }
+          },
+          borderRadius: {
+            lg: 'var(--radius)',
+            md: 'calc(var(--radius) - 2px)',
+            sm: 'calc(var(--radius) - 6px)'
+          },
+          boxShadow: {
+            soft: '0 1px 2px rgba(15, 23, 42, 0.06), 0 8px 24px rgba(15, 23, 42, 0.05)'
+          },
+          fontFamily: {
+            sans: ['Inter', 'ui-sans-serif', 'system-ui', '-apple-system', 'BlinkMacSystemFont', 'Segoe UI', 'sans-serif']
+          }
+        }
+      }
+    };
+  </script>
+  <style>
+    :root {
+      color-scheme: light;
+      --background: 0 0% 100%;
+      --foreground: 222.2 84% 4.9%;
+      --card: 0 0% 100%;
+      --card-foreground: 222.2 84% 4.9%;
+      --popover: 0 0% 100%;
+      --popover-foreground: 222.2 84% 4.9%;
+      --primary: 222.2 47.4% 11.2%;
+      --primary-foreground: 210 40% 98%;
+      --secondary: 210 40% 96.1%;
+      --secondary-foreground: 222.2 47.4% 11.2%;
+      --muted: 210 40% 96.1%;
+      --muted-foreground: 215.4 16.3% 46.9%;
+      --accent: 210 40% 96.1%;
+      --accent-foreground: 222.2 47.4% 11.2%;
+      --destructive: 0 84.2% 60.2%;
+      --destructive-foreground: 210 40% 98%;
+      --border: 214.3 31.8% 91.4%;
+      --input: 214.3 31.8% 91.4%;
+      --ring: 222.2 84% 4.9%;
+      --radius: 1rem;
+    }
+
+    * {
+      -webkit-tap-highlight-color: transparent;
+      box-sizing: border-box;
+    }
+
+    html, body {
+      width: 100%;
+      height: 100%;
+      margin: 0;
+      padding: 0;
+      overflow: hidden;
+      background: hsl(var(--background));
+      color: hsl(var(--foreground));
+      font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      overscroll-behavior: none;
+    }
+
+    body {
+      -webkit-font-smoothing: antialiased;
+      text-rendering: optimizeLegibility;
+    }
+
+    mark {
+      color: inherit;
+      background: transparent;
+    }
+
+    ::-webkit-scrollbar {
+      width: 10px;
+      height: 10px;
+    }
+
+    ::-webkit-scrollbar-thumb {
+      border-radius: 999px;
+      background: rgba(15, 23, 42, 0.16);
+      border: 2px solid transparent;
+      background-clip: padding-box;
+    }
+
+    ::-webkit-scrollbar-track {
+      background: transparent;
+    }
+
+    .card {
+      border: 1px solid hsl(var(--border));
+      background: hsl(var(--card));
+      color: hsl(var(--card-foreground));
+      border-radius: calc(var(--radius) + 2px);
+      box-shadow: 0 1px 2px rgba(15, 23, 42, 0.04), 0 8px 24px rgba(15, 23, 42, 0.04);
+    }
+
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.5rem;
+      white-space: nowrap;
+      border-radius: calc(var(--radius) - 0.25rem);
+      font-size: 0.875rem;
+      font-weight: 600;
+      line-height: 1;
+      transition: background-color 0.18s ease, color 0.18s ease, border-color 0.18s ease, transform 0.18s ease, box-shadow 0.18s ease;
+      height: 2.75rem;
+      padding: 0 1rem;
+      border: 1px solid transparent;
+      cursor: pointer;
+      text-decoration: none;
+    }
+
+    .btn:focus-visible,
+    .input:focus-visible,
+    .textarea:focus-visible,
+    .search-input:focus-visible,
+    .otp-cell-active {
+      outline: 2px solid hsl(var(--ring));
+      outline-offset: 2px;
+    }
+
+    .btn:hover {
+      transform: translateY(-1px);
+    }
+
+    .btn:disabled {
+      opacity: 0.55;
+      cursor: not-allowed;
+      transform: none;
+    }
+
+    .btn-primary {
+      background: hsl(var(--primary));
+      color: hsl(var(--primary-foreground));
+      box-shadow: 0 10px 24px rgba(15, 23, 42, 0.12);
+    }
+
+    .btn-primary:hover {
+      background: hsl(var(--primary) / 0.92);
+    }
+
+    .btn-outline {
+      border-color: hsl(var(--input));
+      background: hsl(var(--background));
+      color: hsl(var(--foreground));
+    }
+
+    .btn-outline:hover {
+      background: hsl(var(--muted));
+    }
+
+    .btn-ghost {
+      background: transparent;
+      color: hsl(var(--foreground));
+    }
+
+    .btn-ghost:hover {
+      background: hsl(var(--muted));
+    }
+
+    .btn-destructive {
+      background: hsl(var(--destructive));
+      color: hsl(var(--destructive-foreground));
+      box-shadow: 0 10px 24px rgba(220, 38, 38, 0.18);
+    }
+
+    .btn-destructive:hover {
+      background: hsl(var(--destructive) / 0.92);
+    }
+
+    .btn-icon {
+      width: 2.75rem;
+      padding: 0;
+    }
+
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.35rem;
+      border-radius: 9999px;
+      border: 1px solid transparent;
+      padding: 0.25rem 0.625rem;
+      font-size: 0.75rem;
+      font-weight: 700;
+      letter-spacing: 0.01em;
+      white-space: nowrap;
+    }
+
+    .badge-secondary {
+      border-color: hsl(var(--border));
+      background: hsl(var(--secondary));
+      color: hsl(var(--secondary-foreground));
+    }
+
+    .badge-success {
+      border-color: #bbf7d0;
+      background: #dcfce7;
+      color: #166534;
+    }
+
+    .badge-warning {
+      border-color: #fde68a;
+      background: #fef3c7;
+      color: #92400e;
+    }
+
+    .badge-destructive {
+      border-color: #fecaca;
+      background: #fee2e2;
+      color: #991b1b;
+    }
+
+    .field-label {
+      font-size: 0.75rem;
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: hsl(var(--muted-foreground));
+    }
+
+    .input,
+    .textarea,
+    .search-input {
+      width: 100%;
+      border-radius: calc(var(--radius) - 0.25rem);
+      border: 1px solid hsl(var(--input));
+      background: hsl(var(--background));
+      color: hsl(var(--foreground));
+      font-size: 0.875rem;
+      transition: border-color 0.18s ease, box-shadow 0.18s ease, background-color 0.18s ease;
+    }
+
+    .input,
+    .search-input {
+      height: 2.75rem;
+      padding: 0 0.875rem;
+    }
+
+    .textarea {
+      padding: 0.75rem 0.875rem;
+      resize: vertical;
+      min-height: 6rem;
+    }
+
+    .input:focus,
+    .textarea:focus,
+    .search-input:focus {
+      border-color: hsl(var(--ring));
+      box-shadow: 0 0 0 4px hsl(var(--ring) / 0.08);
+      outline: none;
+    }
+
+    .search-shell {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      border: 1px solid hsl(var(--border));
+      background: hsl(var(--card));
+      border-radius: calc(var(--radius) + 0.25rem);
+      padding: 0 0.5rem 0 0.875rem;
+      box-shadow: 0 1px 2px rgba(15, 23, 42, 0.03);
+    }
+
+    .search-input {
+      border: 0;
+      box-shadow: none;
+      padding-left: 0;
+      padding-right: 0;
+      background: transparent;
+    }
+
+    .nav-item {
+      display: flex;
+      width: 100%;
+      align-items: center;
+      gap: 0.75rem;
+      border-radius: 1rem;
+      padding: 0.75rem;
+      border: 1px solid transparent;
+      color: hsl(var(--muted-foreground));
+      transition: background-color 0.18s ease, border-color 0.18s ease, color 0.18s ease;
+    }
+
+    .nav-item:hover {
+      background: hsl(var(--background));
+      color: hsl(var(--foreground));
+    }
+
+    .nav-item-active {
+      background: hsl(var(--background));
+      border-color: hsl(var(--border));
+      color: hsl(var(--foreground));
+      box-shadow: 0 1px 2px rgba(15, 23, 42, 0.03);
+    }
+
+    .mobile-nav {
+      position: fixed;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      z-index: 40;
+      border-top: 1px solid hsl(var(--border));
+      background: hsl(var(--background) / 0.96);
+      backdrop-filter: blur(18px);
+      padding-bottom: max(0.5rem, env(safe-area-inset-bottom));
+    }
+
+    .mobile-nav-item {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 0.25rem;
+      min-height: 4.25rem;
+      border-radius: 1rem;
+      color: hsl(var(--muted-foreground));
+    }
+
+    .mobile-nav-item-active {
+      color: hsl(var(--foreground));
+    }
+
+    .table-shell {
+      width: 100%;
+      border-collapse: collapse;
+    }
+
+    .table-shell th,
+    .table-shell td {
+      border-bottom: 1px solid hsl(var(--border));
+      padding: 0.875rem 1rem;
+      vertical-align: top;
+      text-align: left;
+      font-size: 0.875rem;
+    }
+
+    .table-shell th {
+      font-size: 0.75rem;
+      font-weight: 700;
+      color: hsl(var(--muted-foreground));
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      background: hsl(var(--muted) / 0.55);
+    }
+
+    .table-shell tbody tr:hover {
+      background: hsl(var(--muted) / 0.35);
+    }
+
+    .table-sort {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.35rem;
+      background: transparent;
+      border: 0;
+      padding: 0;
+      font: inherit;
+      text-transform: inherit;
+      color: inherit;
+      cursor: pointer;
+    }
+
+    .progress-track {
+      width: 100%;
+      height: 0.5rem;
+      overflow: hidden;
+      border-radius: 999px;
+      background: hsl(var(--muted));
+    }
+
+    .progress-bar {
+      height: 100%;
+      border-radius: inherit;
+      transition: width 0.2s ease;
+    }
+
+    .mini-stat {
+      border: 1px solid hsl(var(--border));
+      border-radius: calc(var(--radius) + 0.125rem);
+      padding: 1rem;
+      box-shadow: 0 1px 2px rgba(15, 23, 42, 0.03);
+    }
+
+    .filter-pill {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.35rem;
+      height: 2.25rem;
+      border-radius: 9999px;
+      border: 1px solid hsl(var(--border));
+      background: hsl(var(--background));
+      padding: 0 0.875rem;
+      font-size: 0.875rem;
+      font-weight: 600;
+      color: hsl(var(--muted-foreground));
+      transition: background-color 0.18s ease, color 0.18s ease, border-color 0.18s ease;
+    }
+
+    .filter-pill-active {
+      background: hsl(var(--primary));
+      border-color: hsl(var(--primary));
+      color: hsl(var(--primary-foreground));
+    }
+
+    .toast-card {
+      pointer-events: auto;
+      max-width: min(92vw, 420px);
+      border-radius: calc(var(--radius) + 0.125rem);
+      border-width: 1px;
+      padding: 0.875rem 1rem;
+      font-size: 0.875rem;
+      font-weight: 600;
+      box-shadow: 0 18px 36px rgba(15, 23, 42, 0.12);
+      animation: toast-in 180ms ease-out;
+    }
+
+    .fab {
+      position: fixed;
+      right: 1rem;
+      bottom: calc(5.5rem + env(safe-area-inset-bottom));
+      display: inline-flex;
+      height: 3.5rem;
+      width: 3.5rem;
+      align-items: center;
+      justify-content: center;
+      border-radius: 1.25rem;
+      border: 0;
+      background: hsl(var(--primary));
+      color: hsl(var(--primary-foreground));
+      box-shadow: 0 18px 30px rgba(15, 23, 42, 0.18);
+    }
+
+    .status-dot {
+      display: inline-flex;
+      height: 0.5rem;
+      width: 0.5rem;
+      border-radius: 9999px;
+    }
+
+    .status-dot-online {
+      background: #16a34a;
+      box-shadow: 0 0 0 6px rgba(22, 163, 74, 0.12);
+    }
+
+    .status-dot-local {
+      background: #f59e0b;
+      box-shadow: 0 0 0 6px rgba(245, 158, 11, 0.12);
+    }
+
+    .otp-cell {
+      display: flex;
+      height: 4rem;
+      align-items: center;
+      justify-content: center;
+      border-radius: 1rem;
+      border: 1px solid hsl(var(--border));
+      background: hsl(var(--background));
+      font-size: 1.5rem;
+      font-weight: 700;
+      color: hsl(var(--foreground));
+      transition: border-color 0.18s ease, box-shadow 0.18s ease, transform 0.18s ease;
+    }
+
+    .otp-cell-filled {
+      border-color: hsl(var(--foreground) / 0.2);
+      background: hsl(var(--secondary));
+    }
+
+    .otp-cell-active {
+      border-color: hsl(var(--ring));
+      box-shadow: 0 0 0 4px hsl(var(--ring) / 0.08);
+    }
+
+    .stat-card,
+    .category-card {
+      transition: transform 0.18s ease, box-shadow 0.18s ease, border-color 0.18s ease;
+    }
+
+    .stat-card:hover,
+    .category-card:hover,
+    .card:hover {
+      border-color: hsl(var(--ring) / 0.28);
+      box-shadow: 0 16px 32px rgba(15, 23, 42, 0.08);
+    }
+
+    .stat-card:hover,
+    .category-card:hover {
+      transform: translateY(-2px);
+    }
+
+    .lucide {
+      width: 1rem;
+      height: 1rem;
+      stroke-width: 2;
+    }
+
+    @keyframes toast-in {
+      from {
+        opacity: 0;
+        transform: translateY(8px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    @media (max-width: 767px) {
+      .table-shell th,
+      .table-shell td {
+        padding: 0.75rem;
+      }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+        scroll-behavior: auto !important;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div id="app" class="h-full w-full"></div>
+  <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js"></script>
+  <script>
+const KawasStockApp = (() => {
+  const IS_GAS = typeof google !== 'undefined' && google.script && google.script.run;
+  const STORAGE_KEYS = Object.freeze({
+    cache: 'kawas-stock-v5-cache',
+    pending: 'kawas-stock-v5-pending',
+    session: 'kawas-stock-v5-session'
+  });
+
+  const NAV_ITEMS = Object.freeze([
+    { id: 'home', label: 'Inicio', icon: 'layout-dashboard' },
+    { id: 'search', label: 'Buscar', icon: 'search' },
+    { id: 'alerts', label: 'Alertas', icon: 'bell' },
+    { id: 'history', label: 'Historial', icon: 'history' },
+    { id: 'report', label: 'Reportes', icon: 'file-text' }
+  ]);
+
+  const STATUS_META = Object.freeze({
+    zero: { label: 'Agotado', badge: 'badge-destructive', text: 'text-red-700', bar: 'bg-red-500' },
+    crit: { label: 'Crítico', badge: 'badge-destructive', text: 'text-red-700', bar: 'bg-red-500' },
+    low: { label: 'Bajo', badge: 'badge-warning', text: 'text-amber-700', bar: 'bg-amber-500' },
+    ok: { label: 'OK', badge: 'badge-success', text: 'text-emerald-700', bar: 'bg-emerald-500' }
+  });
+
+  const CATEGORY_META = Object.freeze({
+    'Etiquetas Adhesivas': { icon: 'tag', tone: 'bg-blue-100 text-blue-700' },
+    'Etiquetas': { icon: 'tag', tone: 'bg-blue-100 text-blue-700' },
+    'Bolsas': { icon: 'package', tone: 'bg-emerald-100 text-emerald-700' },
+    'Bolsas de café': { icon: 'package', tone: 'bg-emerald-100 text-emerald-700' },
+    'Cajas': { icon: 'box', tone: 'bg-amber-100 text-amber-700' },
+    'Cajas de cartón': { icon: 'box', tone: 'bg-amber-100 text-amber-700' },
+    'Empaque y Despacho': { icon: 'truck', tone: 'bg-violet-100 text-violet-700' },
+    'Cold Brew': { icon: 'coffee', tone: 'bg-cyan-100 text-cyan-700' },
+    'Otros': { icon: 'more-horizontal', tone: 'bg-slate-200 text-slate-700' },
+    'Microlotes': { icon: 'star', tone: 'bg-fuchsia-100 text-fuchsia-700' }
+  });
+
+  const DEMO_ITEMS = Object.freeze([
+    { id: 'e1', cat: 'Etiquetas Adhesivas', subcat: 'Funsmart 90x60', name: 'Espresso Original 90x60', stock: 200, min: 100, unit: 'uds', comment: '', statusLabel: 'OK', updatedAt: '', updatedBy: '' },
+    { id: 'e2', cat: 'Etiquetas Adhesivas', subcat: 'Funsmart 90x60', name: 'Espresso Frutal 90x60', stock: 600, min: 150, unit: 'uds', comment: '', statusLabel: 'OK', updatedAt: '', updatedBy: '' },
+    { id: 'e3', cat: 'Etiquetas Adhesivas', subcat: 'Funsmart 90x60', name: 'Bolivia Caranavi Regional 90x60', stock: 0, min: 200, unit: 'uds', comment: 'Contactar proveedor urgente', statusLabel: 'Agotado', updatedAt: '', updatedBy: '' },
+    { id: 'b1', cat: 'Bolsas de café', subcat: 'MTPACK Bolsa Impresa', name: 'Bolsa 250g MTPACK', stock: 75, min: 500, unit: 'uds', comment: '', statusLabel: 'Bajo', updatedAt: '', updatedBy: '' },
+    { id: 'c1', cat: 'Cajas de cartón', subcat: 'Kawas Grandes', name: 'Caja Kawas SYT 12KG', stock: 1850, min: 500, unit: 'uds', comment: '', statusLabel: 'OK', updatedAt: '', updatedBy: '' }
+  ]);
+
+  const DEMO_HISTORY = Object.freeze([
+    { id: 'e3', nm: 'Bolivia Caranavi Regional 90x60', cat: 'Etiquetas Adhesivas', subcat: 'Funsmart 90x60', tp: 'ajuste', os: 100, ns: 0, qty: -100, nt: 'Inventario físico', u: 'Admin', ts: new Date().toISOString() },
+    { id: 'b1', nm: 'Bolsa 250g MTPACK', cat: 'Bolsas de café', subcat: 'MTPACK Bolsa Impresa', tp: 'salida', os: 120, ns: 75, qty: -45, nt: 'Orden producción 123', u: 'Admin', ts: new Date(Date.now() - 3600000).toISOString() }
+  ]);
+
+  const DEMO_USERS = Object.freeze([
+    { n: 'Admin', p: '3891', role: 'admin', active: true },
+    { n: 'Ale', p: '5678', role: 'editor', active: true },
+    { n: 'Roberto', p: '9012', role: 'editor', active: true },
+    { n: 'Mauricio', p: '1213', role: 'viewer', active: true }
+  ]);
+
+  const refs = {};
+  let bootSlowTimer = null;
+  let toastTimer = null;
+
+  const state = {
+    boot: {
+      visible: true,
+      slow: false,
+      message: IS_GAS ? 'Conectando con Google Apps Script...' : 'Cargando modo local...'
+    },
+    app: {
+      title: 'Kawas Control de Stock',
+      version: '2.2.0',
+      env: IS_GAS ? 'gas' : 'local',
+      sheetUrl: '',
+      syncing: false,
+      lastSyncAt: '',
+      ready: false
+    },
+    auth: {
+      user: null,
+      pin: '',
+      error: ''
+    },
+    data: {
+      items: [],
+      history: [],
+      users: []
+    },
+    ui: {
+      view: 'login',
+      search: '',
+      alertFilter: 'all',
+      historyFilter: 'all',
+      historySort: { key: 'ts', dir: 'desc' },
+      showHistoryFilters: false,
+      historyFilters: {
+        search: '',
+        user: '',
+        cat: '',
+        subcat: '',
+        dateFrom: '',
+        dateTo: ''
+      },
+      selectedCat: null,
+      selectedSubcat: null,
+      selectedItemId: null,
+      dialog: null,
+      toast: null
+    },
+    forms: {
+      newItem: defaultNewItemForm(),
+      movement: defaultMovementForm()
+    }
+  };
+
+  function init() {
+    mountShell();
+    bindEvents();
+    hydrateLocalCache();
+    startBootSlowTimer();
+    bootstrap();
+  }
+
+  function mountShell() {
+    const app = document.getElementById('app');
+    app.innerHTML = `
+      <div id="boot-screen" class="fixed inset-0 z-[80] flex items-center justify-center bg-background px-4">
+        <div class="card max-w-sm p-6 text-center shadow-lg">
+          <div class="mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-2xl border bg-muted text-foreground">
+            <div class="h-5 w-5 animate-spin rounded-full border-2 border-primary border-t-transparent"></div>
+          </div>
+          <h2 class="text-base font-semibold tracking-tight">Inicializando inventario</h2>
+          <p id="boot-message" class="mt-2 text-sm text-muted-foreground"></p>
+          <div id="boot-actions" class="mt-5"></div>
+        </div>
+      </div>
+      <div id="shell" class="hidden h-full w-full md:flex md:flex-row">
+        <aside id="desktop-nav" class="hidden md:flex"></aside>
+        <div class="flex min-h-0 min-w-0 flex-1 flex-col">
+          <header id="app-header" class="shrink-0"></header>
+          <main id="app-main" class="min-h-0 flex-1"></main>
+        </div>
+        <nav id="mobile-nav" class="md:hidden"></nav>
+        <div id="overlay-root"></div>
+        <div id="toast-root"></div>
+      </div>
+    `;
+
+    refs.boot = document.getElementById('boot-screen');
+    refs.bootMessage = document.getElementById('boot-message');
+    refs.bootActions = document.getElementById('boot-actions');
+    refs.shell = document.getElementById('shell');
+    refs.desktopNav = document.getElementById('desktop-nav');
+    refs.header = document.getElementById('app-header');
+    refs.main = document.getElementById('app-main');
+    refs.mobileNav = document.getElementById('mobile-nav');
+    refs.overlay = document.getElementById('overlay-root');
+    refs.toast = document.getElementById('toast-root');
+  }
+
+  function bindEvents() {
+    document.addEventListener('click', handleClick);
+    document.addEventListener('submit', handleSubmit);
+    document.addEventListener('input', handleInput);
+    document.addEventListener('keydown', handleKeydown);
+    bindBackGestures();
+  }
+
+  function hydrateLocalCache() {
+    const cached = storage.read(STORAGE_KEYS.cache, null);
+    if (cached && Array.isArray(cached.items)) {
+      state.data.items = cached.items.map(normalizeItem);
+      state.data.history = Array.isArray(cached.history) ? cached.history.map(normalizeHistoryEntry) : [];
+      state.data.users = Array.isArray(cached.users) ? cached.users.map(normalizeUser) : DEMO_USERS.slice();
+      state.app.title = cached.app && cached.app.title ? cached.app.title : state.app.title;
+      state.app.sheetUrl = cached.app && cached.app.sheetUrl ? cached.app.sheetUrl : '';
+      state.app.version = cached.app && cached.app.version ? cached.app.version : state.app.version;
+    } else {
+      state.data.items = DEMO_ITEMS.map(normalizeItem);
+      state.data.history = DEMO_HISTORY.map(normalizeHistoryEntry);
+      state.data.users = DEMO_USERS.map(normalizeUser);
+    }
+    reconcileSessionUser();
+  }
+
+  async function bootstrap() {
+    setBootMessage(state.boot.message);
+
+    if (!IS_GAS) {
+      state.boot.message = 'Modo local listo. Puedes probar la app sin servidor.';
+      state.app.ready = true;
+      state.ui.view = state.auth.user ? 'home' : 'login';
+      persistCache();
+      completeBoot();
+      return;
+    }
+
+    try {
+      const response = await bridge.call('getBootstrapData');
+      if (!response || response.success === false) {
+        throw new Error((response && (response.details || response.error)) || 'Error desconocido');
+      }
+      applyBootstrapPayload(response);
+      state.app.ready = true;
+      state.ui.view = state.auth.user ? 'home' : 'login';
+      persistCache();
+      completeBoot();
+      const pending = storage.read(STORAGE_KEYS.pending, []);
+      if (pending.length) {
+        syncAll({ showToast: true });
+      }
+    } catch (error) {
+      state.boot.message = 'No se pudo conectar al servidor. Se activó el modo local de rescate.';
+      state.data.users = DEMO_USERS.map(normalizeUser);
+      state.auth.error = 'No se pudo conectar al backend. Revisa KAWAS_SPREADSHEET_ID o ejecuta forceRepairDeployment() en Apps Script. Mientras tanto, puedes entrar con los usuarios de respaldo.';
+      state.app.ready = true;
+      state.ui.view = state.auth.user ? 'home' : 'login';
+      persistCache();
+      completeBoot();
+      pushToast('Modo rescate activo · revisa Spreadsheet ID', 'warning');
+    }
+  }
+
+  function applyBootstrapPayload(payload) {
+    state.app.title = payload.app && payload.app.title ? payload.app.title : state.app.title;
+    state.app.version = payload.app && payload.app.version ? payload.app.version : state.app.version;
+    state.app.sheetUrl = payload.app && payload.app.sheetUrl ? payload.app.sheetUrl : state.app.sheetUrl;
+    state.app.lastSyncAt = payload.app && payload.app.generatedAt ? payload.app.generatedAt : new Date().toISOString();
+    state.data.items = Array.isArray(payload.items) ? payload.items.map(normalizeItem) : [];
+    state.data.history = Array.isArray(payload.hist) ? payload.hist.map(normalizeHistoryEntry) : [];
+    state.data.users = Array.isArray(payload.users) && payload.users.length ? payload.users.map(normalizeUser) : DEMO_USERS.map(normalizeUser);
+    reconcileSessionUser();
+  }
+
+  function completeBoot() {
+    clearTimeout(bootSlowTimer);
+    state.boot.visible = false;
+    render();
+    refs.boot.classList.add('opacity-0');
+    setTimeout(() => {
+      if (refs.boot) {
+        refs.boot.style.display = 'none';
+      }
+    }, 220);
+  }
+
+  function startBootSlowTimer() {
+    clearTimeout(bootSlowTimer);
+    bootSlowTimer = setTimeout(() => {
+      if (!state.app.ready) {
+        state.boot.slow = true;
+        renderBoot();
+      }
+    }, 7000);
+  }
+
+  function render() {
+    refs.shell.classList.remove('hidden');
+    renderBoot();
+    renderHeader();
+    renderDesktopNav();
+    renderMobileNav();
+    renderMain();
+    renderOverlay();
+    renderToast();
+    refreshIcons();
+    runPostRenderFocus();
+  }
+
+  function renderBoot() {
+    if (!refs.boot) {
+      return;
+    }
+    refs.boot.style.display = state.boot.visible ? 'flex' : refs.boot.style.display;
+    setBootMessage(state.boot.message);
+    refs.bootActions.innerHTML = state.boot.slow ? `
+      <button type="button" class="btn btn-outline w-full" data-action="force-offline">
+        Entrar con caché local
+      </button>
+      <p class="mt-3 text-xs text-muted-foreground">Si el despliegue de Apps Script está lento, puedes seguir trabajando offline y sincronizar después.</p>
+    ` : '';
+  }
+
+  function setBootMessage(message) {
+    if (refs.bootMessage) {
+      refs.bootMessage.textContent = message;
+    }
+  }
+
+  function renderHeader() {
+    if (!state.auth.user) {
+      refs.header.innerHTML = '';
+      refs.header.className = 'hidden';
+      return;
+    }
+
+    const screen = resolveScreen();
+    const backable = ['item', 'category', 'subcat', 'newItem'].includes(screen);
+    const pendingCount = getPendingOperations().length;
+
+    refs.header.className = 'border-b border-border bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/75';
+    refs.header.innerHTML = `
+      <div class="mx-auto flex w-full max-w-6xl items-center gap-3 px-4 py-3 md:px-6">
+        ${backable ? `
+          <button type="button" class="btn btn-ghost btn-icon" data-action="back" aria-label="Volver">
+            <span data-lucide="arrow-left"></span>
+          </button>
+        ` : `
+          <div class="hidden h-10 w-10 items-center justify-center rounded-xl border bg-card shadow-sm md:flex">
+            <span data-lucide="package"></span>
+          </div>
+        `}
+        <div class="min-w-0 flex-1">
+          <p class="text-xs font-medium uppercase tracking-[0.18em] text-muted-foreground">${escapeHtml(state.app.title)}</p>
+          <div class="flex items-center gap-2">
+            <h1 class="truncate text-lg font-semibold tracking-tight md:text-2xl">${escapeHtml(getViewTitle(screen))}</h1>
+            ${pendingCount ? `<span class="badge badge-warning">${pendingCount} pendiente${pendingCount === 1 ? '' : 's'}</span>` : ''}
+          </div>
+          <p class="text-xs text-muted-foreground">${escapeHtml(getViewSubtitle(screen))}</p>
+        </div>
+        <button type="button" class="btn btn-outline btn-icon relative ${state.app.syncing ? 'animate-pulse' : ''}" data-action="sync" aria-label="Sincronizar">
+          <span data-lucide="refresh-cw" class="${state.app.syncing ? 'animate-spin' : ''}"></span>
+          ${pendingCount ? `<span class="absolute -right-1 -top-1 flex h-5 min-w-[1.25rem] items-center justify-center rounded-full bg-primary px-1 text-[10px] font-bold text-primary-foreground">${pendingCount}</span>` : ''}
+        </button>
+      </div>
+    `;
+  }
+
+  function renderDesktopNav() {
+    if (!state.auth.user) {
+      refs.desktopNav.className = 'hidden';
+      refs.desktopNav.innerHTML = '';
+      return;
+    }
+
+    refs.desktopNav.className = 'hidden h-full w-[280px] shrink-0 border-r border-border bg-muted/30 md:flex md:flex-col';
+    refs.desktopNav.innerHTML = `
+      <div class="flex h-full flex-col px-4 py-5">
+        <div class="mb-6 flex items-center gap-3 px-2">
+          <div class="flex h-10 w-10 items-center justify-center rounded-2xl border bg-card shadow-sm">
+            <span data-lucide="package"></span>
+          </div>
+          <div class="min-w-0">
+            <p class="truncate text-sm font-semibold">${escapeHtml(state.app.title)}</p>
+            <p class="text-xs text-muted-foreground">Arquitectura shadcn/ui · Apps Script</p>
+          </div>
+        </div>
+        <div class="space-y-1">
+          ${NAV_ITEMS.map(renderDesktopNavItem).join('')}
+        </div>
+        <div class="mt-6">
+          <button type="button" class="btn btn-primary w-full justify-start" data-action="open-new-item">
+            <span data-lucide="plus"></span>
+            Nuevo producto
+          </button>
+        </div>
+        <div class="mt-auto card p-4">
+          <div class="flex items-center gap-3">
+            <div class="flex h-10 w-10 items-center justify-center rounded-full bg-muted font-semibold text-foreground">${escapeHtml(initialsFor(state.auth.user.n))}</div>
+            <div class="min-w-0 flex-1">
+              <p class="truncate text-sm font-medium">${escapeHtml(state.auth.user.n)}</p>
+              <p class="text-xs text-muted-foreground">${escapeHtml(state.auth.user.role || 'editor')}</p>
+            </div>
+            <button type="button" class="btn btn-ghost btn-icon" data-action="logout" aria-label="Cerrar sesión">
+              <span data-lucide="log-out"></span>
+            </button>
+          </div>
+        </div>
+      </div>
+    `;
+  }
+
+  function renderDesktopNavItem(item) {
+    const active = !state.ui.selectedCat && !state.ui.selectedItemId && state.ui.view === item.id;
+    const criticalCount = item.id === 'alerts' ? selectors.alerts().filter(entry => ['zero', 'crit'].includes(getStatusKey(entry))).length : 0;
+    return `
+      <button type="button" class="nav-item ${active ? 'nav-item-active' : ''}" data-action="tab" data-tab="${item.id}">
+        <span class="inline-flex h-9 w-9 items-center justify-center rounded-xl ${active ? 'bg-primary text-primary-foreground' : 'bg-card text-foreground'}">
+          <span data-lucide="${item.icon}"></span>
+        </span>
+        <span class="flex-1 text-left">${escapeHtml(item.label)}</span>
+        ${criticalCount ? `<span class="badge badge-destructive">${criticalCount}</span>` : ''}
+      </button>
+    `;
+  }
+
+  function renderMobileNav() {
+    if (!state.auth.user) {
+      refs.mobileNav.className = 'hidden';
+      refs.mobileNav.innerHTML = '';
+      return;
+    }
+
+    refs.mobileNav.className = 'mobile-nav md:hidden';
+    refs.mobileNav.innerHTML = `
+      <div class="grid grid-cols-5 gap-1 p-2">
+        ${NAV_ITEMS.map(renderMobileNavItem).join('')}
+      </div>
+    `;
+  }
+
+  function renderMobileNavItem(item) {
+    const active = !state.ui.selectedCat && !state.ui.selectedItemId && state.ui.view === item.id;
+    const criticalCount = item.id === 'alerts' ? selectors.alerts().filter(entry => ['zero', 'crit'].includes(getStatusKey(entry))).length : 0;
+    return `
+      <button type="button" class="mobile-nav-item ${active ? 'mobile-nav-item-active' : ''}" data-action="tab" data-tab="${item.id}">
+        <div class="relative inline-flex h-9 w-9 items-center justify-center rounded-xl ${active ? 'bg-primary text-primary-foreground' : 'bg-transparent text-muted-foreground'}">
+          <span data-lucide="${item.icon}"></span>
+          ${criticalCount ? `<span class="absolute -right-1 -top-1 h-2.5 w-2.5 rounded-full bg-red-500"></span>` : ''}
+        </div>
+        <span class="text-[11px] font-medium">${escapeHtml(item.label)}</span>
+      </button>
+    `;
+  }
+
+  function renderMain() {
+    refs.main.className = 'min-h-0 flex-1';
+
+    const screen = resolveScreen();
+    if (screen === 'login') {
+      refs.main.innerHTML = renderLoginView();
+      return;
+    }
+
+    refs.main.innerHTML = `
+      <div class="h-full overflow-y-auto">
+        <div class="mx-auto w-full max-w-6xl px-4 pb-24 pt-4 md:px-6 md:pb-8 md:pt-6">
+          ${screen === 'home' ? renderHomeView() : ''}
+          ${screen === 'search' ? renderSearchView() : ''}
+          ${screen === 'alerts' ? renderAlertsView() : ''}
+          ${screen === 'history' ? renderHistoryView() : ''}
+          ${screen === 'report' ? renderReportView() : ''}
+          ${screen === 'category' ? renderCategoryView() : ''}
+          ${screen === 'subcat' ? renderSubcategoryView() : ''}
+          ${screen === 'item' ? renderItemView() : ''}
+          ${screen === 'newItem' ? renderNewItemView() : ''}
+        </div>
+      </div>
+    `;
+  }
+
+  function renderOverlay() {
+    if (!state.auth.user) {
+      refs.overlay.innerHTML = '';
+      return;
+    }
+
+    if (state.ui.dialog && state.ui.dialog.type === 'movement') {
+      refs.overlay.innerHTML = renderMovementDialog();
+      return;
+    }
+
+    refs.overlay.innerHTML = '';
+  }
+
+  function renderToast() {
+    if (!state.ui.toast) {
+      refs.toast.innerHTML = '';
+      return;
+    }
+
+    const toneClass = state.ui.toast.tone === 'error'
+      ? 'border-red-200 bg-red-50 text-red-700'
+      : state.ui.toast.tone === 'warning'
+        ? 'border-amber-200 bg-amber-50 text-amber-800'
+        : 'border-emerald-200 bg-emerald-50 text-emerald-700';
+
+    refs.toast.innerHTML = `
+      <div class="pointer-events-none fixed inset-x-0 bottom-24 z-[70] flex justify-center px-4 md:bottom-6 md:px-6">
+        <div class="toast-card ${toneClass}">
+          <span>${escapeHtml(state.ui.toast.message)}</span>
+        </div>
+      </div>
+    `;
+  }
+
+  function renderLoginView() {
+    const pin = state.auth.pin || '';
+    const availableUsers = (state.data.users.length ? state.data.users : DEMO_USERS)
+      .map(entry => entry.n)
+      .filter(Boolean)
+      .join(' · ');
+    const cells = Array.from({ length: 4 }, (_, index) => {
+      const filled = pin[index] || '';
+      const active = index === pin.length && pin.length < 4;
+      return `
+        <div class="otp-cell ${filled ? 'otp-cell-filled' : ''} ${active ? 'otp-cell-active' : ''}">
+          ${filled ? '•' : ''}
+        </div>
+      `;
+    }).join('');
+
+    return `
+      <section class="flex min-h-full items-center justify-center py-6 md:py-10">
+        <div class="w-full max-w-md space-y-6">
+          <div class="space-y-3 text-center">
+            <div class="mx-auto flex h-14 w-14 items-center justify-center rounded-3xl border bg-card shadow-sm">
+              <span data-lucide="package"></span>
+            </div>
+            <div>
+              <h1 class="text-2xl font-semibold tracking-tight">${escapeHtml(state.app.title)}</h1>
+              <p class="mt-2 text-sm text-muted-foreground">Acceso interno con PIN. Diseño y patrones basados en shadcn/ui.</p>
+            </div>
+          </div>
+          <div class="card p-6 md:p-7">
+            <form id="form-login" class="space-y-5" autocomplete="off">
+              <div class="space-y-2">
+                <label class="field-label" for="pin-input">PIN de acceso</label>
+                <div class="relative cursor-text" data-action="focus-pin">
+                  <div class="grid grid-cols-4 gap-2">${cells}</div>
+                  <input id="pin-input" name="pin" type="tel" inputmode="numeric" maxlength="4" class="sr-only" value="${escapeHtml(pin)}" />
+                </div>
+                <p class="text-xs text-muted-foreground">Usa un PIN de 4 dígitos configurado en la pestaña <strong>usuarios</strong>.</p>
+              </div>
+              <button type="submit" class="btn btn-primary w-full" ${pin.length !== 4 ? 'disabled' : ''}>
+                Ingresar
+              </button>
+            </form>
+            <div class="mt-5 flex items-center justify-between gap-3 rounded-xl border bg-muted/40 px-3 py-2 text-xs text-muted-foreground">
+              <span class="inline-flex items-center gap-2">
+                <span class="status-dot ${IS_GAS ? 'status-dot-online' : 'status-dot-local'}"></span>
+                ${IS_GAS ? 'Conectado a Apps Script' : 'Modo local / demo'}
+              </span>
+              <span>${escapeHtml(state.app.version)}</span>
+            </div>
+            <p class="mt-3 text-xs text-muted-foreground">Usuarios activos cargados: ${escapeHtml(availableUsers || 'sin usuarios')}</p>
+            ${state.auth.error ? `<p class="mt-4 rounded-lg border border-amber-200 bg-amber-50 px-3 py-2 text-sm text-amber-800">${escapeHtml(state.auth.error)}</p>` : ''}
+          </div>
+        </div>
+      </section>
+    `;
+  }
+
+  function renderHomeView() {
+    const stats = selectors.dashboardStats();
+    const categories = selectors.categories();
+
+    return `
+      <section class="space-y-6">
+        <div class="grid grid-cols-2 gap-3 md:grid-cols-4 md:gap-4">
+          ${renderStatCard('total', 'Productos', stats.totalItems, 'Inventario total', 'bg-blue-100 text-blue-700')}
+          ${renderStatCard('low', 'Bajo mínimo', stats.lowCount, 'Productos bajo mínimo', 'bg-amber-100 text-amber-700')}
+          ${renderStatCard('crit', 'Críticos', stats.critCount, 'Stock crítico', 'bg-red-100 text-red-700')}
+          ${renderStatCard('zero', 'Agotados', stats.zeroCount, 'Sin unidades disponibles', 'bg-red-100 text-red-700')}
+        </div>
+        <div class="flex items-center justify-between gap-3">
+          <div>
+            <h2 class="text-lg font-semibold tracking-tight">Inventario por categoría</h2>
+            <p class="text-sm text-muted-foreground">Explora el stock, alertas y subcategorías desde un mismo panel.</p>
+          </div>
+          <button type="button" class="btn btn-primary hidden md:inline-flex" data-action="open-new-item">
+            <span data-lucide="plus"></span>
+            Nuevo producto
+          </button>
+        </div>
+        <div class="grid grid-cols-1 gap-3 md:grid-cols-2 xl:grid-cols-3">
+          ${categories.map(renderCategoryCard).join('')}
+        </div>
+        <button type="button" class="fab md:hidden" data-action="open-new-item" aria-label="Nuevo producto">
+          <span data-lucide="plus"></span>
+        </button>
+      </section>
+    `;
+  }
+
+  function renderSearchView() {
+    const query = state.ui.search.trim();
+    const results = selectors.searchResults();
+    const categories = selectors.categories();
+
+    return `
+      <section class="space-y-4">
+        <div class="sticky top-0 z-10 rounded-2xl border bg-background/95 p-2 backdrop-blur supports-[backdrop-filter]:bg-background/80">
+          <div class="search-shell">
+            <span class="text-muted-foreground"><span data-lucide="search"></span></span>
+            <input id="search-input" name="search" type="search" class="search-input" placeholder="Buscar por nombre, ID, categoría, subcategoría o comentario" value="${escapeHtml(state.ui.search)}" />
+            ${query ? `<button type="button" class="btn btn-ghost btn-icon" data-action="clear-search" aria-label="Limpiar búsqueda"><span data-lucide="x"></span></button>` : ''}
+          </div>
+        </div>
+        ${!query ? `
+          <div class="grid grid-cols-1 gap-3 md:grid-cols-2 xl:grid-cols-3">
+            ${categories.map(renderCategoryCard).join('')}
+          </div>
+        ` : results.length ? `
+          <div class="grid grid-cols-1 gap-3 md:grid-cols-2 xl:grid-cols-3">
+            ${results.map(renderSearchResultCard).join('')}
+          </div>
+        ` : renderEmptyState('Sin resultados', `No encontramos coincidencias para “${escapeHtml(query)}”.`, 'search')}
+      </section>
+    `;
+  }
+
+  function renderAlertsView() {
+    const alerts = selectors.alerts();
+    const filtered = state.ui.alertFilter === 'all' ? alerts : alerts.filter(item => getStatusKey(item) === state.ui.alertFilter);
+    const counts = {
+      low: alerts.filter(item => getStatusKey(item) === 'low').length,
+      crit: alerts.filter(item => getStatusKey(item) === 'crit').length,
+      zero: alerts.filter(item => getStatusKey(item) === 'zero').length
+    };
+
+    return `
+      <section class="space-y-4">
+        <div class="flex flex-wrap gap-2">
+          ${renderPill('all', 'Todas', state.ui.alertFilter === 'all', 'set-alert-filter')}
+          ${renderPill('low', `Bajo (${counts.low})`, state.ui.alertFilter === 'low', 'set-alert-filter')}
+          ${renderPill('crit', `Crítico (${counts.crit})`, state.ui.alertFilter === 'crit', 'set-alert-filter')}
+          ${renderPill('zero', `Agotado (${counts.zero})`, state.ui.alertFilter === 'zero', 'set-alert-filter')}
+        </div>
+        ${filtered.length ? `
+          <div class="space-y-3">
+            ${filtered.map(renderAlertCard).join('')}
+          </div>
+        ` : renderEmptyState('Todo en orden', 'No hay alertas para el filtro seleccionado.', 'bell')}
+      </section>
+    `;
+  }
+
+  function renderHistoryView() {
+    const history = selectors.filteredHistory();
+    const summary = selectors.historySummary();
+    const options = selectors.historyFilterOptions();
+    const sort = state.ui.historySort;
+
+    return `
+      <section class="space-y-4">
+        <div class="grid grid-cols-2 gap-3 md:grid-cols-4">
+          ${renderMiniStat('Total', summary.total, 'bg-card')}
+          ${renderMiniStat('Ingresos', summary.ingreso, 'bg-emerald-50')}
+          ${renderMiniStat('Salidas', summary.salida, 'bg-red-50')}
+          ${renderMiniStat('Ajustes', summary.ajuste, 'bg-blue-50')}
+        </div>
+        <div class="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
+          <div class="flex flex-wrap gap-2">
+            ${renderPill('all', 'Todos', state.ui.historyFilter === 'all', 'set-history-filter')}
+            ${renderPill('ingreso', 'Ingresos', state.ui.historyFilter === 'ingreso', 'set-history-filter')}
+            ${renderPill('salida', 'Salidas', state.ui.historyFilter === 'salida', 'set-history-filter')}
+            ${renderPill('ajuste', 'Ajustes', state.ui.historyFilter === 'ajuste', 'set-history-filter')}
+          </div>
+          <button type="button" class="btn btn-outline" data-action="toggle-history-filters">
+            <span data-lucide="filter"></span>
+            ${state.ui.showHistoryFilters ? 'Ocultar filtros' : 'Filtros avanzados'}
+          </button>
+        </div>
+        ${state.ui.showHistoryFilters ? `
+          <form id="form-history-filters" class="card grid gap-4 p-4 md:grid-cols-3">
+            <div>
+              <label class="field-label">Buscar producto o nota</label>
+              <input name="history.search" class="input mt-1" value="${escapeHtml(state.ui.historyFilters.search)}" placeholder="Palabra clave" />
+            </div>
+            <div>
+              <label class="field-label">Usuario</label>
+              <select name="history.user" class="input mt-1">
+                <option value="">Todos</option>
+                ${options.users.map(option => `<option value="${escapeHtml(option)}" ${state.ui.historyFilters.user === option ? 'selected' : ''}>${escapeHtml(option)}</option>`).join('')}
+              </select>
+            </div>
+            <div>
+              <label class="field-label">Categoría</label>
+              <select name="history.cat" class="input mt-1">
+                <option value="">Todas</option>
+                ${options.categories.map(option => `<option value="${escapeHtml(option)}" ${state.ui.historyFilters.cat === option ? 'selected' : ''}>${escapeHtml(option)}</option>`).join('')}
+              </select>
+            </div>
+            <div>
+              <label class="field-label">Subcategoría</label>
+              <select name="history.subcat" class="input mt-1" ${state.ui.historyFilters.cat ? '' : 'disabled'}>
+                <option value="">Todas</option>
+                ${options.subcategories.map(option => `<option value="${escapeHtml(option)}" ${state.ui.historyFilters.subcat === option ? 'selected' : ''}>${escapeHtml(option)}</option>`).join('')}
+              </select>
+            </div>
+            <div>
+              <label class="field-label">Desde</label>
+              <input name="history.dateFrom" type="date" class="input mt-1" value="${escapeHtml(state.ui.historyFilters.dateFrom)}" />
+            </div>
+            <div>
+              <label class="field-label">Hasta</label>
+              <input name="history.dateTo" type="date" class="input mt-1" value="${escapeHtml(state.ui.historyFilters.dateTo)}" />
+            </div>
+            <div class="md:col-span-3 flex flex-wrap justify-end gap-2">
+              <button type="button" class="btn btn-ghost" data-action="clear-history-filters">Limpiar</button>
+              <button type="submit" class="btn btn-primary">Aplicar filtros</button>
+            </div>
+          </form>
+        ` : ''}
+        ${history.length ? `
+          <div class="overflow-hidden rounded-2xl border bg-card shadow-sm">
+            <div class="overflow-x-auto">
+              <table class="table-shell min-w-[820px]">
+                <thead>
+                  <tr>
+                    ${renderSortableHead('ts', 'Fecha', sort)}
+                    ${renderSortableHead('u', 'Usuario', sort)}
+                    ${renderSortableHead('nm', 'Producto', sort)}
+                    ${renderSortableHead('tp', 'Tipo', sort)}
+                    ${renderSortableHead('qty', 'Movimiento', sort, 'text-right')}
+                  </tr>
+                </thead>
+                <tbody>
+                  ${history.slice(0, 200).map(renderHistoryRow).join('')}
+                </tbody>
+              </table>
+            </div>
+          </div>
+        ` : renderEmptyState('Sin movimientos', 'No hay registros para los filtros activos.', 'history')}
+      </section>
+    `;
+  }
+
+  function renderReportView() {
+    const stats = selectors.dashboardStats();
+    return `
+      <section class="space-y-4">
+        <div class="card overflow-hidden p-6 md:p-8">
+          <div class="grid gap-6 md:grid-cols-[1.4fr_1fr] md:items-center">
+            <div>
+              <span class="badge badge-secondary">Reporte consolidado</span>
+              <h2 class="mt-3 text-2xl font-semibold tracking-tight md:text-3xl">Exporta una foto completa del inventario</h2>
+              <p class="mt-3 max-w-2xl text-sm text-muted-foreground md:text-base">Genera un PDF imprimible con el estado del stock, alertas operativas y proyecciones de agotamiento basadas en movimientos reales.</p>
+              <div class="mt-6 flex flex-wrap gap-2">
+                <button type="button" class="btn btn-primary" data-action="generate-report">
+                  <span data-lucide="file-text"></span>
+                  Descargar reporte PDF
+                </button>
+                <button type="button" class="btn btn-outline" data-action="open-sheet">
+                  <span data-lucide="database"></span>
+                  Abrir hoja de cálculo
+                </button>
+              </div>
+            </div>
+            <div class="grid grid-cols-2 gap-3">
+              ${renderMiniStat('Productos', stats.totalItems, 'bg-blue-50')}
+              ${renderMiniStat('Unidades', stats.totalStock.toLocaleString('es-CL'), 'bg-card')}
+              ${renderMiniStat('Críticos', stats.critCount + stats.zeroCount, 'bg-red-50')}
+              ${renderMiniStat('Bajo mínimo', stats.lowCount, 'bg-amber-50')}
+            </div>
+          </div>
+        </div>
+      </section>
+    `;
+  }
+
+  function renderCategoryView() {
+    const category = state.ui.selectedCat;
+    const subcategories = selectors.subcategories(category);
+
+    return `
+      <section class="space-y-4">
+        <div>
+          <h2 class="text-xl font-semibold tracking-tight">${escapeHtml(category)}</h2>
+          <p class="text-sm text-muted-foreground">Selecciona una subcategoría para ver el detalle del inventario.</p>
+        </div>
+        <div class="grid grid-cols-1 gap-3 md:grid-cols-2 xl:grid-cols-3">
+          ${subcategories.map(renderSubcategoryCard).join('')}
+        </div>
+      </section>
+    `;
+  }
+
+  function renderSubcategoryView() {
+    const items = selectors.itemsForSelectedSubcategory();
+    return `
+      <section class="space-y-4">
+        <div>
+          <p class="text-sm text-muted-foreground">${escapeHtml(state.ui.selectedCat || '')}</p>
+          <h2 class="text-xl font-semibold tracking-tight">${escapeHtml(state.ui.selectedSubcat || '')}</h2>
+        </div>
+        <div class="grid grid-cols-1 gap-3 md:grid-cols-2 xl:grid-cols-3">
+          ${items.map(renderItemCard).join('')}
+        </div>
+      </section>
+    `;
+  }
+
+  function renderItemView() {
+    const item = selectors.selectedItem();
+    if (!item) {
+      return renderEmptyState('Producto no disponible', 'No encontramos el producto seleccionado.', 'package');
+    }
+
+    const status = getStatusMeta(item);
+    const progress = getStockProgress(item);
+    const projection = getProjection(item);
+    const history = selectors.itemHistory(item.id).slice(0, 12);
+
+    return `
+      <section class="space-y-4">
+        <div class="grid gap-4 lg:grid-cols-[1.2fr_0.8fr]">
+          <div class="card p-5 md:p-6">
+            <div class="flex flex-wrap items-start justify-between gap-3">
+              <div>
+                <p class="text-sm text-muted-foreground">${escapeHtml(item.cat)} · ${escapeHtml(item.subcat || 'General')}</p>
+                <h2 class="mt-1 text-2xl font-semibold tracking-tight">${escapeHtml(item.name)}</h2>
+                <div class="mt-3 flex flex-wrap items-center gap-2">
+                  <span class="badge ${status.badge}">${status.label}</span>
+                  <span class="badge badge-secondary">ID ${escapeHtml(item.id)}</span>
+                  ${item.comment ? `<span class="badge badge-secondary">Comentario activo</span>` : ''}
+                </div>
+              </div>
+              <div class="text-right">
+                <p class="text-sm text-muted-foreground">Stock actual</p>
+                <p class="text-4xl font-semibold tracking-tight ${status.text}">${formatNumber(item.stock)}</p>
+                <p class="text-sm text-muted-foreground">${escapeHtml(item.unit)}</p>
+              </div>
+            </div>
+            <div class="mt-6 space-y-2">
+              <div class="flex items-center justify-between text-sm text-muted-foreground">
+                <span>Mínimo operativo: ${formatNumber(item.min)}</span>
+                <span>${progress}%</span>
+              </div>
+              <div class="progress-track">
+                <div class="progress-bar ${status.bar}" style="width:${Math.min(100, progress)}%"></div>
+              </div>
+            </div>
+            ${item.comment ? `<div class="mt-4 rounded-xl border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-800">${escapeHtml(item.comment)}</div>` : ''}
+            <div class="mt-6 grid grid-cols-1 gap-2 sm:grid-cols-3">
+              <button type="button" class="btn btn-primary justify-center" data-action="open-movement" data-mode="ingreso">
+                <span data-lucide="plus"></span>
+                Ingreso
+              </button>
+              <button type="button" class="btn btn-destructive justify-center" data-action="open-movement" data-mode="salida">
+                <span data-lucide="minus"></span>
+                Salida
+              </button>
+              <button type="button" class="btn btn-outline justify-center" data-action="open-movement" data-mode="ajuste">
+                <span data-lucide="pencil"></span>
+                Ajustar
+              </button>
+            </div>
+          </div>
+          <div class="card p-5 md:p-6">
+            <h3 class="text-base font-semibold tracking-tight">Proyección de agotamiento</h3>
+            <p class="mt-1 text-sm text-muted-foreground">Estimación basada en movimientos registrados para este producto.</p>
+            <div class="mt-5 grid grid-cols-3 gap-3 text-center">
+              <div class="rounded-xl border bg-muted/30 p-3">
+                <p class="text-2xl font-semibold tracking-tight">${escapeHtml(String(projection.days))}</p>
+                <p class="mt-1 text-[11px] uppercase tracking-wide text-muted-foreground">Días restantes</p>
+              </div>
+              <div class="rounded-xl border bg-muted/30 p-3">
+                <p class="text-2xl font-semibold tracking-tight">${escapeHtml(String(projection.dailyUse))}</p>
+                <p class="mt-1 text-[11px] uppercase tracking-wide text-muted-foreground">Uso / día</p>
+              </div>
+              <div class="rounded-xl border bg-muted/30 p-3">
+                <p class="text-lg font-semibold tracking-tight">${escapeHtml(projection.dateOut)}</p>
+                <p class="mt-1 text-[11px] uppercase tracking-wide text-muted-foreground">Agotamiento</p>
+              </div>
+            </div>
+            <div class="mt-4 rounded-xl border bg-muted/30 p-4 text-sm text-muted-foreground">
+              <strong class="text-foreground">${escapeHtml(projection.title)}.</strong> ${escapeHtml(projection.subtitle)}
+            </div>
+            ${item.updatedAt ? `<p class="mt-4 text-xs text-muted-foreground">Última actualización: ${escapeHtml(formatDateTime(item.updatedAt))}${item.updatedBy ? ` · ${escapeHtml(item.updatedBy)}` : ''}</p>` : ''}
+          </div>
+        </div>
+        <div class="card overflow-hidden">
+          <div class="flex items-center justify-between border-b px-5 py-4">
+            <div>
+              <h3 class="text-base font-semibold tracking-tight">Historial reciente</h3>
+              <p class="text-sm text-muted-foreground">Últimos movimientos relacionados con este producto.</p>
+            </div>
+            <button type="button" class="btn btn-ghost" data-action="tab" data-tab="history">Ver historial completo</button>
+          </div>
+          ${history.length ? `
+            <div class="divide-y">
+              ${history.map(renderInlineHistory).join('')}
+            </div>
+          ` : `<div class="p-5">${renderEmptyState('Sin movimientos', 'Aún no hay movimientos registrados para este producto.', 'history', true)}</div>`}
+        </div>
+      </section>
+    `;
+  }
+
+  function renderNewItemView() {
+    const form = state.forms.newItem;
+    const categories = selectors.categoryNames();
+    const subcategories = selectors.subcategoryNames(form.cat);
+
+    return `
+      <section class="space-y-4">
+        <div>
+          <h2 class="text-xl font-semibold tracking-tight">Nuevo producto</h2>
+          <p class="text-sm text-muted-foreground">Alta de producto coherente con la estructura del backend y la hoja de cálculo.</p>
+        </div>
+        <form id="form-new-item" class="card space-y-5 p-5 md:p-6">
+          <div class="grid gap-4 md:grid-cols-2">
+            <div class="md:col-span-2">
+              <label class="field-label" for="new-item-name">Nombre del producto</label>
+              <input id="new-item-name" name="newItem.name" class="input mt-1" required value="${escapeHtml(form.name)}" placeholder="Ej. Etiqueta Espresso Original 90x60" />
+            </div>
+            <div>
+              <label class="field-label" for="new-item-cat">Categoría</label>
+              <input id="new-item-cat" name="newItem.cat" list="new-item-categories" class="input mt-1" required value="${escapeHtml(form.cat)}" placeholder="Selecciona o escribe una nueva" />
+              <datalist id="new-item-categories">
+                ${categories.map(cat => `<option value="${escapeHtml(cat)}"></option>`).join('')}
+              </datalist>
+            </div>
+            <div>
+              <label class="field-label" for="new-item-subcat">Subcategoría</label>
+              <input id="new-item-subcat" name="newItem.subcat" list="new-item-subcategories" class="input mt-1" value="${escapeHtml(form.subcat)}" placeholder="General o subcategoría" />
+              <datalist id="new-item-subcategories">
+                ${subcategories.map(subcat => `<option value="${escapeHtml(subcat)}"></option>`).join('')}
+              </datalist>
+            </div>
+            <div>
+              <label class="field-label" for="new-item-stock">Stock inicial</label>
+              <input id="new-item-stock" name="newItem.stock" type="number" min="0" class="input mt-1" required value="${escapeHtml(form.stock)}" />
+            </div>
+            <div>
+              <label class="field-label" for="new-item-min">Stock mínimo</label>
+              <input id="new-item-min" name="newItem.min" type="number" min="0" class="input mt-1" required value="${escapeHtml(form.min)}" />
+            </div>
+            <div>
+              <label class="field-label" for="new-item-unit">Unidad</label>
+              <input id="new-item-unit" name="newItem.unit" class="input mt-1" value="${escapeHtml(form.unit)}" placeholder="uds, kg, cajas..." />
+            </div>
+            <div class="md:col-span-2">
+              <label class="field-label" for="new-item-comment">Comentario del producto</label>
+              <textarea id="new-item-comment" name="newItem.comment" class="textarea mt-1" rows="3" placeholder="Observación general del producto, proveedor, nota operativa...">${escapeHtml(form.comment)}</textarea>
+            </div>
+          </div>
+          <div class="flex flex-wrap justify-end gap-2 border-t pt-4">
+            <button type="button" class="btn btn-ghost" data-action="back">Cancelar</button>
+            <button type="submit" class="btn btn-primary">
+              <span data-lucide="plus"></span>
+              Guardar producto
+            </button>
+          </div>
+        </form>
+      </section>
+    `;
+  }
+
+  function renderMovementDialog() {
+    const item = selectors.selectedItem();
+    if (!item) {
+      return '';
+    }
+
+    const mode = state.ui.dialog.mode;
+    const form = state.forms.movement;
+    const title = mode === 'ingreso' ? 'Registrar ingreso' : mode === 'salida' ? 'Registrar salida' : 'Ajustar stock';
+    const helper = mode === 'ajuste' ? 'Ingresa el nuevo stock absoluto.' : 'Ingresa la cantidad del movimiento.';
+    const buttonClass = mode === 'salida' ? 'btn btn-destructive' : 'btn btn-primary';
+
+    return `
+      <div class="fixed inset-0 z-[60] bg-black/40 backdrop-blur-[2px]" data-action="close-dialog"></div>
+      <div class="fixed inset-x-0 bottom-0 z-[61] rounded-t-[1.5rem] border bg-background p-4 pb-[max(1rem,env(safe-area-inset-bottom))] shadow-2xl md:inset-auto md:left-1/2 md:top-1/2 md:w-full md:max-w-md md:-translate-x-1/2 md:-translate-y-1/2 md:rounded-2xl">
+        <div class="mx-auto mb-4 h-1.5 w-12 rounded-full bg-border md:hidden"></div>
+        <div class="flex items-start justify-between gap-3">
+          <div>
+            <p class="text-sm text-muted-foreground">${escapeHtml(item.name)}</p>
+            <h3 class="text-lg font-semibold tracking-tight">${escapeHtml(title)}</h3>
+            <p class="mt-1 text-sm text-muted-foreground">${escapeHtml(helper)}</p>
+          </div>
+          <button type="button" class="btn btn-ghost btn-icon" data-action="close-dialog" aria-label="Cerrar">
+            <span data-lucide="x"></span>
+          </button>
+        </div>
+        <form id="form-movement" class="mt-5 space-y-4">
+          <div>
+            <label class="field-label" for="movement-quantity">${mode === 'ajuste' ? 'Nuevo stock' : 'Cantidad'}</label>
+            <input id="movement-quantity" name="movement.quantity" type="number" inputmode="numeric" min="0" class="input mt-1" required value="${escapeHtml(form.quantity)}" />
+          </div>
+          <div>
+            <label class="field-label" for="movement-note">Nota del movimiento</label>
+            <textarea id="movement-note" name="movement.note" rows="3" class="textarea mt-1" placeholder="Motivo, factura, orden de producción, conteo físico...">${escapeHtml(form.note)}</textarea>
+          </div>
+          <div class="flex flex-wrap justify-end gap-2 border-t pt-4">
+            <button type="button" class="btn btn-ghost" data-action="close-dialog">Cancelar</button>
+            <button type="submit" class="${buttonClass}">Confirmar</button>
+          </div>
+        </form>
+      </div>
+    `;
+  }
+
+  function renderStatCard(key, label, value, description, toneClass) {
+    return `
+      <button type="button" class="card stat-card text-left" data-action="open-kpi" data-kpi="${key}">
+        <div class="flex items-center justify-between gap-3">
+          <span class="badge badge-secondary">${escapeHtml(label)}</span>
+          <span class="inline-flex h-10 w-10 items-center justify-center rounded-2xl ${toneClass}">
+            <span data-lucide="${key === 'total' ? 'package' : key === 'low' ? 'bell' : 'alert-triangle'}"></span>
+          </span>
+        </div>
+        <div class="mt-5 text-4xl font-semibold tracking-tight">${escapeHtml(String(value))}</div>
+        <p class="mt-2 text-sm text-muted-foreground">${escapeHtml(description)}</p>
+      </button>
+    `;
+  }
+
+  function renderCategoryCard(summary) {
+    const meta = categoryMeta(summary.name);
+    return `
+      <button type="button" class="card category-card text-left" data-action="open-cat" data-cat="${escapeHtml(summary.name)}">
+        <div class="flex items-start justify-between gap-3">
+          <div class="flex min-w-0 items-start gap-3">
+            <span class="inline-flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl ${meta.tone}">
+              <span data-lucide="${meta.icon}"></span>
+            </span>
+            <div class="min-w-0">
+              <h3 class="truncate text-base font-semibold tracking-tight">${escapeHtml(summary.name)}</h3>
+              <p class="text-sm text-muted-foreground">${summary.count} producto${summary.count === 1 ? '' : 's'} · ${formatNumber(summary.totalStock)} ${escapeHtml(summary.unitLabel)}</p>
+            </div>
+          </div>
+          <span data-lucide="chevron-right" class="text-muted-foreground"></span>
+        </div>
+        <div class="mt-4 flex flex-wrap gap-2">
+          ${summary.zeroCount ? `<span class="badge badge-destructive">${summary.zeroCount} agotado${summary.zeroCount === 1 ? '' : 's'}</span>` : ''}
+          ${summary.critCount ? `<span class="badge badge-destructive">${summary.critCount} crítico${summary.critCount === 1 ? '' : 's'}</span>` : ''}
+          ${summary.lowCount ? `<span class="badge badge-warning">${summary.lowCount} bajo mínimo</span>` : ''}
+          ${!summary.zeroCount && !summary.critCount && !summary.lowCount ? `<span class="badge badge-success">Todo OK</span>` : ''}
+        </div>
+      </button>
+    `;
+  }
+
+  function renderSubcategoryCard(summary) {
+    return `
+      <button type="button" class="card text-left" data-action="open-subcat" data-subcat="${escapeHtml(summary.name)}">
+        <div class="flex items-start justify-between gap-3">
+          <div>
+            <h3 class="text-base font-semibold tracking-tight">${escapeHtml(summary.name)}</h3>
+            <p class="text-sm text-muted-foreground">${summary.count} producto${summary.count === 1 ? '' : 's'} · ${formatNumber(summary.totalStock)} unidades</p>
+          </div>
+          <span data-lucide="chevron-right" class="text-muted-foreground"></span>
+        </div>
+        <div class="mt-4 flex flex-wrap gap-2">
+          ${summary.zeroCount ? `<span class="badge badge-destructive">${summary.zeroCount} agotados</span>` : ''}
+          ${summary.critCount ? `<span class="badge badge-destructive">${summary.critCount} críticos</span>` : ''}
+          ${summary.lowCount ? `<span class="badge badge-warning">${summary.lowCount} bajos</span>` : ''}
+          ${!summary.zeroCount && !summary.critCount && !summary.lowCount ? `<span class="badge badge-success">Todo OK</span>` : ''}
+        </div>
+      </button>
+    `;
+  }
+
+  function renderItemCard(item) {
+    const status = getStatusMeta(item);
+    const progress = getStockProgress(item);
+    return `
+      <button type="button" class="card text-left" data-action="open-item" data-item-id="${escapeHtml(item.id)}">
+        <div class="flex items-start justify-between gap-3">
+          <div class="min-w-0">
+            <h3 class="truncate text-base font-semibold tracking-tight">${escapeHtml(item.name)}</h3>
+            <p class="truncate text-sm text-muted-foreground">${escapeHtml(item.subcat || 'General')}</p>
+          </div>
+          <span class="badge ${status.badge}">${status.label}</span>
+        </div>
+        <div class="mt-5 flex items-end justify-between gap-3">
+          <div>
+            <div class="text-3xl font-semibold tracking-tight ${status.text}">${formatNumber(item.stock)}</div>
+            <p class="text-sm text-muted-foreground">${escapeHtml(item.unit)} · mínimo ${formatNumber(item.min)}</p>
+          </div>
+          <span data-lucide="chevron-right" class="text-muted-foreground"></span>
+        </div>
+        <div class="mt-4 progress-track">
+          <div class="progress-bar ${status.bar}" style="width:${Math.min(100, progress)}%"></div>
+        </div>
+      </button>
+    `;
+  }
+
+  function renderSearchResultCard(item) {
+    const status = getStatusMeta(item);
+    return `
+      <button type="button" class="card text-left" data-action="open-item" data-item-id="${escapeHtml(item.id)}">
+        <div class="flex items-start justify-between gap-3">
+          <div class="min-w-0">
+            <h3 class="truncate text-base font-semibold tracking-tight">${highlight(item.name, state.ui.search)}</h3>
+            <p class="truncate text-sm text-muted-foreground">${highlight(`${item.cat} · ${item.subcat || 'General'} · ${item.id}`, state.ui.search)}</p>
+          </div>
+          <span class="badge ${status.badge}">${status.label}</span>
+        </div>
+        <div class="mt-4 flex items-end justify-between gap-3">
+          <div>
+            <div class="text-3xl font-semibold tracking-tight ${status.text}">${formatNumber(item.stock)}</div>
+            <p class="text-sm text-muted-foreground">${escapeHtml(item.unit)}</p>
+          </div>
+          <span data-lucide="chevron-right" class="text-muted-foreground"></span>
+        </div>
+      </button>
+    `;
+  }
+
+  function renderAlertCard(item) {
+    const status = getStatusMeta(item);
+    return `
+      <button type="button" class="card text-left" data-action="open-item" data-item-id="${escapeHtml(item.id)}">
+        <div class="flex items-start justify-between gap-3">
+          <div>
+            <div class="flex flex-wrap items-center gap-2">
+              <h3 class="text-base font-semibold tracking-tight">${escapeHtml(item.name)}</h3>
+              <span class="badge ${status.badge}">${status.label}</span>
+            </div>
+            <p class="mt-1 text-sm text-muted-foreground">${escapeHtml(item.cat)} · ${escapeHtml(item.subcat || 'General')}</p>
+          </div>
+          <div class="text-right">
+            <div class="text-3xl font-semibold tracking-tight ${status.text}">${formatNumber(item.stock)}</div>
+            <p class="text-xs text-muted-foreground">mínimo ${formatNumber(item.min)}</p>
+          </div>
+        </div>
+        ${item.comment ? `<div class="mt-4 rounded-xl border border-amber-200 bg-amber-50 px-3 py-2 text-sm text-amber-800">${escapeHtml(item.comment)}</div>` : ''}
+      </button>
+    `;
+  }
+
+  function renderInlineHistory(entry) {
+    const delta = entry.ns - entry.os;
+    const deltaClass = delta >= 0 ? 'text-emerald-700' : 'text-red-700';
+    return `
+      <div class="flex items-start justify-between gap-3 px-5 py-4">
+        <div class="min-w-0 flex-1">
+          <div class="flex flex-wrap items-center gap-2">
+            <span class="badge badge-secondary">${escapeHtml(entry.tp)}</span>
+            <span class="text-sm text-muted-foreground">${escapeHtml(formatDateTime(entry.ts))}</span>
+          </div>
+          <p class="mt-2 text-sm font-medium">${entry.os} → ${entry.ns}</p>
+          <p class="text-sm text-muted-foreground">${escapeHtml(entry.nt || 'Sin nota')} · ${escapeHtml(entry.u)}</p>
+        </div>
+        <div class="text-sm font-semibold ${deltaClass}">${delta > 0 ? '+' : ''}${delta}</div>
+      </div>
+    `;
+  }
+
+  function renderSortableHead(key, label, sort, extraClass) {
+    const active = sort.key === key;
+    const arrow = active ? (sort.dir === 'asc' ? '↑' : '↓') : '';
+    return `
+      <th class="${extraClass || ''}">
+        <button type="button" class="table-sort ${active ? 'text-foreground' : ''}" data-action="sort-history" data-sort-key="${key}">
+          ${escapeHtml(label)}
+          <span>${arrow}</span>
+        </button>
+      </th>
+    `;
+  }
+
+  function renderHistoryRow(entry) {
+    const delta = entry.ns - entry.os;
+    const deltaClass = delta >= 0 ? 'text-emerald-700' : 'text-red-700';
+    const typeBadge = entry.tp === 'ingreso' ? 'badge-success' : entry.tp === 'salida' ? 'badge-destructive' : 'badge-secondary';
+    return `
+      <tr>
+        <td>${escapeHtml(formatDateTime(entry.ts))}</td>
+        <td>${escapeHtml(entry.u)}</td>
+        <td>
+          <div class="font-medium text-foreground">${escapeHtml(entry.nm)}</div>
+          <div class="text-sm text-muted-foreground">${escapeHtml(entry.cat)} · ${escapeHtml(entry.subcat || 'General')}${entry.nt ? ` · ${escapeHtml(entry.nt)}` : ''}</div>
+        </td>
+        <td><span class="badge ${typeBadge}">${escapeHtml(entry.tp)}</span></td>
+        <td class="text-right">
+          <div class="text-xs text-muted-foreground">${entry.os} → ${entry.ns}</div>
+          <div class="font-semibold ${deltaClass}">${delta > 0 ? '+' : ''}${delta}</div>
+        </td>
+      </tr>
+    `;
+  }
+
+  function renderMiniStat(label, value, bgClass) {
+    return `
+      <div class="mini-stat ${bgClass}">
+        <p class="text-2xl font-semibold tracking-tight">${escapeHtml(String(value))}</p>
+        <p class="mt-1 text-xs uppercase tracking-[0.18em] text-muted-foreground">${escapeHtml(label)}</p>
+      </div>
+    `;
+  }
+
+  function renderPill(value, label, active, action) {
+    return `
+      <button type="button" class="filter-pill ${active ? 'filter-pill-active' : ''}" data-action="${action}" data-value="${escapeHtml(value)}">
+        ${escapeHtml(label)}
+      </button>
+    `;
+  }
+
+  function renderEmptyState(title, description, icon, compact) {
+    return `
+      <div class="${compact ? '' : 'card'} flex flex-col items-center justify-center gap-3 ${compact ? 'text-center' : 'min-h-[260px] p-8 text-center'}">
+        <div class="flex h-12 w-12 items-center justify-center rounded-2xl border bg-muted text-muted-foreground">
+          <span data-lucide="${icon}"></span>
+        </div>
+        <div>
+          <h3 class="text-base font-semibold tracking-tight">${escapeHtml(title)}</h3>
+          <p class="mt-1 text-sm text-muted-foreground">${description}</p>
+        </div>
+      </div>
+    `;
+  }
+
+  function handleClick(event) {
+    const target = event.target.closest('[data-action]');
+    if (!target) {
+      return;
+    }
+
+    const action = target.dataset.action;
+    if (action === 'focus-pin') {
+      const input = document.getElementById('pin-input');
+      if (input) input.focus();
+      return;
+    }
+    if (action === 'force-offline') {
+      state.boot.visible = false;
+      state.app.ready = true;
+      state.ui.view = state.auth.user ? 'home' : 'login';
+      completeBoot();
+      return;
+    }
+    if (action === 'back') {
+      goBack();
+      return;
+    }
+    if (action === 'logout') {
+      logout();
+      return;
+    }
+    if (action === 'sync') {
+      syncAll({ showToast: true });
+      return;
+    }
+    if (action === 'open-new-item') {
+      resetSelections();
+      state.ui.view = 'newItem';
+      render();
+      return;
+    }
+    if (action === 'tab') {
+      switchTab(target.dataset.tab);
+      return;
+    }
+    if (action === 'open-kpi') {
+      openKpi(target.dataset.kpi);
+      return;
+    }
+    if (action === 'open-cat') {
+      const category = target.dataset.cat;
+      const subcategories = selectors.subcategories(category);
+      state.ui.selectedCat = category;
+      state.ui.selectedSubcat = subcategories.length === 1 && subcategories[0].name === 'General' ? 'General' : null;
+      state.ui.selectedItemId = null;
+      render();
+      return;
+    }
+    if (action === 'open-subcat') {
+      state.ui.selectedSubcat = target.dataset.subcat;
+      state.ui.selectedItemId = null;
+      render();
+      return;
+    }
+    if (action === 'open-item') {
+      state.ui.selectedItemId = target.dataset.itemId;
+      render();
+      return;
+    }
+    if (action === 'open-movement') {
+      state.ui.dialog = { type: 'movement', mode: target.dataset.mode || 'ajuste' };
+      state.forms.movement = defaultMovementForm();
+      render();
+      return;
+    }
+    if (action === 'close-dialog') {
+      state.ui.dialog = null;
+      state.forms.movement = defaultMovementForm();
+      render();
+      return;
+    }
+    if (action === 'set-alert-filter') {
+      state.ui.alertFilter = target.dataset.value || 'all';
+      render();
+      return;
+    }
+    if (action === 'set-history-filter') {
+      state.ui.historyFilter = target.dataset.value || 'all';
+      render();
+      return;
+    }
+    if (action === 'sort-history') {
+      const key = target.dataset.sortKey;
+      if (state.ui.historySort.key === key) {
+        state.ui.historySort.dir = state.ui.historySort.dir === 'asc' ? 'desc' : 'asc';
+      } else {
+        state.ui.historySort.key = key;
+        state.ui.historySort.dir = 'desc';
+      }
+      render();
+      return;
+    }
+    if (action === 'toggle-history-filters') {
+      state.ui.showHistoryFilters = !state.ui.showHistoryFilters;
+      render();
+      return;
+    }
+    if (action === 'clear-history-filters') {
+      state.ui.historyFilters = defaultHistoryFilters();
+      render();
+      return;
+    }
+    if (action === 'clear-search') {
+      state.ui.search = '';
+      renderMain();
+      refreshIcons();
+      runPostRenderFocus();
+      return;
+    }
+    if (action === 'generate-report') {
+      generateReport();
+      return;
+    }
+    if (action === 'open-sheet') {
+      openSheetUrl();
+      return;
+    }
+  }
+
+  function handleSubmit(event) {
+    if (event.target.id === 'form-login') {
+      event.preventDefault();
+      attemptLogin();
+      return;
+    }
+
+    if (event.target.id === 'form-new-item') {
+      event.preventDefault();
+      submitNewItem();
+      return;
+    }
+
+    if (event.target.id === 'form-movement') {
+      event.preventDefault();
+      submitMovement();
+      return;
+    }
+
+    if (event.target.id === 'form-history-filters') {
+      event.preventDefault();
+      render();
+    }
+  }
+
+  function handleInput(event) {
+    const target = event.target;
+    if (!target.name) {
+      return;
+    }
+
+    if (target.name === 'pin') {
+      state.auth.pin = String(target.value || '').replace(/\D+/g, '').slice(0, 4);
+      target.value = state.auth.pin;
+      renderMain();
+      refreshIcons();
+      runPostRenderFocus();
+      if (state.auth.pin.length === 4) {
+        attemptLogin();
+      }
+      return;
+    }
+
+    if (target.name === 'search') {
+      state.ui.search = target.value;
+      renderMain();
+      refreshIcons();
+      runPostRenderFocus();
+      return;
+    }
+
+    if (target.name.startsWith('newItem.')) {
+      const field = target.name.split('.')[1];
+      state.forms.newItem[field] = target.value;
+      if (field === 'cat') {
+        state.forms.newItem.subcat = state.forms.newItem.subcat || '';
+        renderMain();
+        refreshIcons();
+        runPostRenderFocus('new-item-subcat');
+      }
+      return;
+    }
+
+    if (target.name.startsWith('movement.')) {
+      const field = target.name.split('.')[1];
+      state.forms.movement[field] = target.value;
+      return;
+    }
+
+    if (target.name.startsWith('history.')) {
+      const field = target.name.split('.')[1];
+      state.ui.historyFilters[field] = target.value;
+      if (field === 'cat') {
+        state.ui.historyFilters.subcat = '';
+        renderMain();
+        refreshIcons();
+      }
+    }
+  }
+
+  function handleKeydown(event) {
+    if (event.key === 'Escape') {
+      if (state.ui.dialog) {
+        state.ui.dialog = null;
+        state.forms.movement = defaultMovementForm();
+        render();
+      } else if (state.auth.user) {
+        goBack();
+      }
+    }
+  }
+
+  function bindBackGestures() {
+    let startX = 0;
+    let startY = 0;
+    document.addEventListener('touchstart', evt => {
+      startX = evt.touches[0].clientX;
+      startY = evt.touches[0].clientY;
+    }, { passive: true });
+
+    document.addEventListener('touchend', evt => {
+      const dx = evt.changedTouches[0].clientX - startX;
+      const dy = Math.abs(evt.changedTouches[0].clientY - startY);
+      if (dx > 88 && dy < 80) {
+        goBack();
+      }
+    }, { passive: true });
+
+    let wheelAccumulator = 0;
+    let wheelTimer = null;
+    document.addEventListener('wheel', evt => {
+      if (Math.abs(evt.deltaX) > Math.abs(evt.deltaY) + 5) {
+        wheelAccumulator += evt.deltaX;
+        if (wheelAccumulator < -140) {
+          goBack();
+          wheelAccumulator = 0;
+        }
+        clearTimeout(wheelTimer);
+        wheelTimer = setTimeout(() => {
+          wheelAccumulator = 0;
+        }, 240);
+      }
+    }, { passive: true });
+  }
+
+  function attemptLogin() {
+    const pin = state.auth.pin;
+    if (pin.length !== 4) {
+      pushToast('Ingresa un PIN de 4 dígitos', 'warning');
+      return;
+    }
+
+    const user = (state.data.users.length ? state.data.users : DEMO_USERS).find(entry => String(entry.p) === pin);
+    if (!user) {
+      state.auth.error = 'PIN incorrecto o usuario inactivo.';
+      state.auth.pin = '';
+      render();
+      pushToast('PIN incorrecto', 'error');
+      return;
+    }
+
+    state.auth.user = normalizeUser(user);
+    state.auth.pin = '';
+    state.auth.error = '';
+    storage.writeSession(state.auth.user);
+    state.ui.view = 'home';
+    render();
+    if (IS_GAS) {
+      syncAll({ showToast: false });
+    }
+    pushToast(`Bienvenido, ${state.auth.user.n}`, 'success');
+  }
+
+  function logout() {
+    state.auth.user = null;
+    state.auth.pin = '';
+    state.ui.dialog = null;
+    resetSelections();
+    state.ui.view = 'login';
+    storage.clear(STORAGE_KEYS.session);
+    render();
+  }
+
+  function switchTab(tab) {
+    resetSelections();
+    state.ui.view = tab || 'home';
+    if (state.ui.view === 'search') {
+      state.ui.search = '';
+    }
+    render();
+  }
+
+  function openKpi(kpi) {
+    if (kpi === 'total') {
+      switchTab('search');
+      return;
+    }
+    resetSelections();
+    state.ui.view = 'alerts';
+    state.ui.alertFilter = kpi;
+    render();
+  }
+
+  function goBack() {
+    if (!state.auth.user) {
+      return;
+    }
+    if (state.ui.dialog) {
+      state.ui.dialog = null;
+      state.forms.movement = defaultMovementForm();
+      render();
+      return;
+    }
+    if (state.ui.selectedItemId) {
+      state.ui.selectedItemId = null;
+      render();
+      return;
+    }
+    if (state.ui.selectedSubcat) {
+      state.ui.selectedSubcat = null;
+      render();
+      return;
+    }
+    if (state.ui.selectedCat) {
+      state.ui.selectedCat = null;
+      render();
+      return;
+    }
+    if (state.ui.view === 'newItem') {
+      state.ui.view = 'home';
+      state.forms.newItem = defaultNewItemForm();
+      render();
+    }
+  }
+
+  function resetSelections() {
+    state.ui.selectedCat = null;
+    state.ui.selectedSubcat = null;
+    state.ui.selectedItemId = null;
+    state.ui.dialog = null;
+  }
+
+  async function submitNewItem() {
+    const user = state.auth.user;
+    if (!user) {
+      return;
+    }
+    const form = state.forms.newItem;
+    const payload = {
+      id: `n_${Date.now().toString(36)}${Math.random().toString(36).slice(2, 5)}`,
+      name: form.name.trim(),
+      cat: form.cat.trim(),
+      subcat: form.subcat.trim() || 'General',
+      stock: Number(form.stock || 0),
+      min: Number(form.min || 0),
+      unit: (form.unit || 'uds').trim() || 'uds',
+      comment: form.comment.trim(),
+      note: 'Producto creado en la aplicación',
+      userName: user.n,
+      clientTimestamp: new Date().toISOString()
+    };
+
+    if (!payload.name || !payload.cat) {
+      pushToast('Nombre y categoría son obligatorios', 'error');
+      return;
+    }
+    if (payload.stock < 0 || payload.min < 0) {
+      pushToast('Los valores numéricos no pueden ser negativos', 'error');
+      return;
+    }
+
+    const optimistic = createLocalItem(payload);
+    state.forms.newItem = defaultNewItemForm();
+    state.ui.view = 'home';
+    state.ui.selectedItemId = optimistic.item.id;
+    persistCache();
+    render();
+    pushToast('Producto creado', 'success');
+
+    if (!IS_GAS) {
+      queueOperation({ type: 'createItem', payload });
+      return;
+    }
+
+    try {
+      const response = await bridge.call('createItem', payload);
+      if (!response || response.success === false) {
+        throw new Error((response && (response.details || response.error)) || 'No se pudo crear el producto');
+      }
+      applyServerMutationResult(response);
+      persistCache();
+      render();
+    } catch (error) {
+      queueOperation({ type: 'createItem', payload });
+      pushToast('Producto guardado en cola local', 'warning');
+    }
+  }
+
+  async function submitMovement() {
+    const user = state.auth.user;
+    const item = selectors.selectedItem();
+    const dialog = state.ui.dialog;
+    if (!user || !item || !dialog) {
+      return;
+    }
+
+    const amount = Number(state.forms.movement.quantity);
+    if (!Number.isFinite(amount) || amount < 0) {
+      pushToast('Ingresa un número válido', 'error');
+      return;
+    }
+
+    const newStock = dialog.mode === 'ingreso'
+      ? item.stock + amount
+      : dialog.mode === 'salida'
+        ? Math.max(0, item.stock - amount)
+        : Math.max(0, amount);
+
+    const payload = {
+      itemId: item.id,
+      oldStock: item.stock,
+      newStock,
+      type: dialog.mode,
+      note: state.forms.movement.note.trim(),
+      userName: user.n,
+      clientTimestamp: new Date().toISOString()
+    };
+
+    applyLocalMovement(item, payload);
+    state.ui.dialog = null;
+    state.forms.movement = defaultMovementForm();
+    persistCache();
+    render();
+    pushToast('Movimiento registrado', 'success');
+
+    if (!IS_GAS) {
+      queueOperation({ type: 'applyStockChange', payload });
+      return;
+    }
+
+    try {
+      const response = await bridge.call('applyStockChange', payload);
+      if (!response || response.success === false) {
+        throw new Error((response && (response.details || response.error)) || 'No se pudo sincronizar el movimiento');
+      }
+      applyServerMutationResult(response);
+      persistCache();
+      render();
+    } catch (error) {
+      queueOperation({ type: 'applyStockChange', payload });
+      pushToast('Movimiento guardado en cola local', 'warning');
+    }
+  }
+
+  async function syncAll(options) {
+    const settings = Object.assign({ showToast: true }, options || {});
+    if (!IS_GAS) {
+      if (settings.showToast) {
+        pushToast('Estás en modo local. No hay servidor para sincronizar.', 'warning');
+      }
+      return;
+    }
+    if (state.app.syncing) {
+      return;
+    }
+
+    state.app.syncing = true;
+    renderHeader();
+    renderDesktopNav();
+    renderMobileNav();
+    refreshIcons();
+
+    const pending = getPendingOperations();
+    try {
+      if (pending.length) {
+        const flush = await bridge.call('syncPendingOperations', pending);
+        if (!flush || flush.success === false && (!flush.applied || flush.applied < pending.length)) {
+          const failedIndexes = new Set((flush && flush.errors ? flush.errors : []).map(entry => entry.index));
+          const nextPending = pending.filter((entry, index) => failedIndexes.size ? failedIndexes.has(index) : true);
+          storage.write(STORAGE_KEYS.pending, nextPending);
+          if (flush && flush.bootstrap && flush.bootstrap.success) {
+            applyBootstrapPayload(flush.bootstrap);
+          }
+        } else {
+          storage.write(STORAGE_KEYS.pending, []);
+          if (flush.bootstrap && flush.bootstrap.success) {
+            applyBootstrapPayload(flush.bootstrap);
+          }
+        }
+      }
+
+      const response = await bridge.call('getBootstrapData');
+      if (!response || response.success === false) {
+        throw new Error((response && (response.details || response.error)) || 'No se pudo refrescar el inventario');
+      }
+      applyBootstrapPayload(response);
+      persistCache();
+      if (settings.showToast) {
+        pushToast('Inventario sincronizado', 'success');
+      }
+    } catch (error) {
+      if (settings.showToast) {
+        pushToast('No se pudo sincronizar. Tus cambios siguen en caché.', 'warning');
+      }
+    } finally {
+      state.app.syncing = false;
+      render();
+    }
+  }
+
+  function applyServerMutationResult(response) {
+    if (response.item) {
+      upsertItem(response.item);
+    }
+    if (response.hist) {
+      prependHistory(response.hist);
+    }
+  }
+
+  function createLocalItem(payload) {
+    const item = normalizeItem(payload);
+    const historyEntry = normalizeHistoryEntry({
+      id: payload.id,
+      nm: payload.name,
+      cat: payload.cat,
+      subcat: payload.subcat,
+      tp: 'creación',
+      os: 0,
+      ns: payload.stock,
+      qty: payload.stock,
+      nt: payload.note,
+      u: payload.userName,
+      ts: payload.clientTimestamp
+    });
+    state.data.items.push(item);
+    prependHistory(historyEntry);
+    return { item, historyEntry };
+  }
+
+  function applyLocalMovement(item, payload) {
+    const updatedItem = Object.assign({}, item, {
+      stock: payload.newStock,
+      updatedAt: payload.clientTimestamp,
+      updatedBy: payload.userName
+    });
+    upsertItem(updatedItem);
+    const historyEntry = normalizeHistoryEntry({
+      id: item.id,
+      nm: item.name,
+      cat: item.cat,
+      subcat: item.subcat,
+      tp: payload.type,
+      os: payload.oldStock,
+      ns: payload.newStock,
+      qty: payload.newStock - payload.oldStock,
+      nt: payload.note,
+      u: payload.userName,
+      ts: payload.clientTimestamp
+    });
+    prependHistory(historyEntry);
+  }
+
+  function upsertItem(rawItem) {
+    const item = normalizeItem(rawItem);
+    const index = state.data.items.findIndex(entry => entry.id === item.id);
+    if (index >= 0) {
+      state.data.items.splice(index, 1, item);
+    } else {
+      state.data.items.push(item);
+    }
+  }
+
+  function prependHistory(rawEntry) {
+    const entry = normalizeHistoryEntry(rawEntry);
+    state.data.history = [entry].concat(state.data.history.filter(existing => !(existing.id === entry.id && existing.ts === entry.ts && existing.tp === entry.tp))).slice(0, 1000);
+  }
+
+  function queueOperation(operation) {
+    const pending = getPendingOperations();
+    pending.push(Object.assign({ queuedAt: new Date().toISOString() }, operation));
+    storage.write(STORAGE_KEYS.pending, pending);
+    persistCache();
+  }
+
+  function getPendingOperations() {
+    return storage.read(STORAGE_KEYS.pending, []);
+  }
+
+  function persistCache() {
+    storage.write(STORAGE_KEYS.cache, {
+      app: {
+        title: state.app.title,
+        version: state.app.version,
+        sheetUrl: state.app.sheetUrl
+      },
+      items: state.data.items,
+      history: state.data.history,
+      users: state.data.users,
+      savedAt: new Date().toISOString()
+    });
+  }
+
+  function reconcileSessionUser() {
+    const sessionUser = storage.read(STORAGE_KEYS.session, null);
+    if (!sessionUser) {
+      return;
+    }
+    const matched = state.data.users.find(entry => entry.n === sessionUser.n);
+    if (matched) {
+      state.auth.user = matched;
+      state.ui.view = 'home';
+    } else {
+      storage.clear(STORAGE_KEYS.session);
+      state.auth.user = null;
+    }
+  }
+
+  function normalizeItem(raw) {
+    return {
+      id: String(raw && raw.id || '').trim(),
+      cat: String(raw && raw.cat || '').trim(),
+      subcat: String(raw && raw.subcat || 'General').trim() || 'General',
+      name: String(raw && raw.name || '').trim(),
+      stock: toNumber(raw && raw.stock),
+      min: toNumber(raw && raw.min),
+      unit: String(raw && raw.unit || 'uds').trim() || 'uds',
+      comment: String(raw && (raw.comment || raw.alert || '') || '').trim(),
+      statusLabel: String(raw && raw.statusLabel || '').trim(),
+      updatedAt: raw && raw.updatedAt ? String(raw.updatedAt) : '',
+      updatedBy: String(raw && raw.updatedBy || '').trim()
+    };
+  }
+
+  function normalizeHistoryEntry(raw) {
+    return {
+      id: String(raw && raw.id || '').trim(),
+      nm: String(raw && (raw.nm || raw.name) || '').trim(),
+      cat: String(raw && raw.cat || '').trim(),
+      subcat: String(raw && raw.subcat || 'General').trim() || 'General',
+      tp: String(raw && (raw.tp || raw.type) || '').trim(),
+      os: toNumber(raw && (raw.os != null ? raw.os : raw.oldStock)),
+      ns: toNumber(raw && (raw.ns != null ? raw.ns : raw.newStock)),
+      qty: toNumber(raw && (raw.qty != null ? raw.qty : (toNumber(raw && (raw.ns != null ? raw.ns : raw.newStock)) - toNumber(raw && (raw.os != null ? raw.os : raw.oldStock))))),
+      nt: String(raw && (raw.nt || raw.note) || '').trim(),
+      u: String(raw && (raw.u || raw.userName || raw.user) || '').trim(),
+      ts: normalizeDate(raw && (raw.ts || raw.timestamp))
+    };
+  }
+
+  function normalizeUser(raw) {
+    return {
+      n: String(raw && raw.n || raw && raw.name || '').trim(),
+      p: String(raw && raw.p || raw && raw.pin || '').trim(),
+      role: String(raw && raw.role || 'editor').trim() || 'editor',
+      active: raw && raw.active !== false
+    };
+  }
+
+  const selectors = {
+    categories() {
+      const groups = new Map();
+      state.data.items.forEach(item => {
+        const key = item.cat || 'Sin categoría';
+        if (!groups.has(key)) {
+          groups.set(key, { name: key, count: 0, totalStock: 0, zeroCount: 0, critCount: 0, lowCount: 0, unitLabel: 'unidades' });
+        }
+        const bucket = groups.get(key);
+        bucket.count += 1;
+        bucket.totalStock += item.stock;
+        const status = getStatusKey(item);
+        if (status === 'zero') bucket.zeroCount += 1;
+        else if (status === 'crit') bucket.critCount += 1;
+        else if (status === 'low') bucket.lowCount += 1;
+      });
+      return Array.from(groups.values()).sort((a, b) => a.name.localeCompare(b.name, 'es'));
+    },
+    categoryNames() {
+      return Array.from(new Set(state.data.items.map(item => item.cat).filter(Boolean))).sort((a, b) => a.localeCompare(b, 'es'));
+    },
+    subcategoryNames(cat) {
+      return Array.from(new Set(state.data.items.filter(item => !cat || item.cat === cat).map(item => item.subcat || 'General').filter(Boolean))).sort((a, b) => a.localeCompare(b, 'es'));
+    },
+    subcategories(cat) {
+      const groups = new Map();
+      state.data.items.filter(item => item.cat === cat).forEach(item => {
+        const key = item.subcat || 'General';
+        if (!groups.has(key)) {
+          groups.set(key, { name: key, count: 0, totalStock: 0, zeroCount: 0, critCount: 0, lowCount: 0 });
+        }
+        const bucket = groups.get(key);
+        bucket.count += 1;
+        bucket.totalStock += item.stock;
+        const status = getStatusKey(item);
+        if (status === 'zero') bucket.zeroCount += 1;
+        else if (status === 'crit') bucket.critCount += 1;
+        else if (status === 'low') bucket.lowCount += 1;
+      });
+      return Array.from(groups.values()).sort((a, b) => a.name.localeCompare(b.name, 'es'));
+    },
+    itemsForSelectedSubcategory() {
+      const cat = state.ui.selectedCat;
+      const subcat = state.ui.selectedSubcat;
+      const severity = { zero: 0, crit: 1, low: 2, ok: 3 };
+      return state.data.items
+        .filter(item => item.cat === cat && (item.subcat || 'General') === subcat)
+        .sort((a, b) => (severity[getStatusKey(a)] - severity[getStatusKey(b)]) || a.name.localeCompare(b.name, 'es'));
+    },
+    selectedItem() {
+      return state.data.items.find(item => item.id === state.ui.selectedItemId) || null;
+    },
+    searchResults() {
+      const query = state.ui.search.trim().toLowerCase();
+      if (!query) {
+        return [];
+      }
+      return state.data.items.filter(item => {
+        const haystack = [item.id, item.name, item.cat, item.subcat, item.comment].join(' ').toLowerCase();
+        return haystack.includes(query);
+      }).sort((a, b) => a.name.localeCompare(b.name, 'es'));
+    },
+    alerts() {
+      const severity = { zero: 0, crit: 1, low: 2, ok: 3 };
+      return state.data.items
+        .filter(item => getStatusKey(item) !== 'ok')
+        .sort((a, b) => (severity[getStatusKey(a)] - severity[getStatusKey(b)]) || a.name.localeCompare(b.name, 'es'));
+    },
+    historySummary() {
+      return state.data.history.reduce((acc, entry) => {
+        acc.total += 1;
+        if (entry.tp === 'ingreso') acc.ingreso += 1;
+        else if (entry.tp === 'salida') acc.salida += 1;
+        else acc.ajuste += 1;
+        return acc;
+      }, { total: 0, ingreso: 0, salida: 0, ajuste: 0 });
+    },
+    historyFilterOptions() {
+      const filters = state.ui.historyFilters;
+      const categories = Array.from(new Set(state.data.history.map(entry => entry.cat).filter(Boolean))).sort((a, b) => a.localeCompare(b, 'es'));
+      const users = Array.from(new Set(state.data.history.map(entry => entry.u).filter(Boolean))).sort((a, b) => a.localeCompare(b, 'es'));
+      const subcategories = Array.from(new Set(state.data.history.filter(entry => !filters.cat || entry.cat === filters.cat).map(entry => entry.subcat || 'General').filter(Boolean))).sort((a, b) => a.localeCompare(b, 'es'));
+      return { categories, users, subcategories };
+    },
+    filteredHistory() {
+      const filters = state.ui.historyFilters;
+      const sort = state.ui.historySort;
+      const base = state.data.history.filter(entry => {
+        if (state.ui.historyFilter !== 'all') {
+          if (state.ui.historyFilter === 'ajuste') {
+            if (entry.tp !== 'ajuste' && entry.tp !== 'creación') return false;
+          } else if (entry.tp !== state.ui.historyFilter) {
+            return false;
+          }
+        }
+        if (filters.search) {
+          const q = filters.search.toLowerCase();
+          if (!`${entry.nm} ${entry.nt}`.toLowerCase().includes(q)) {
+            return false;
+          }
+        }
+        if (filters.user && entry.u !== filters.user) return false;
+        if (filters.cat && entry.cat !== filters.cat) return false;
+        if (filters.subcat && (entry.subcat || 'General') !== filters.subcat) return false;
+        if (filters.dateFrom && new Date(entry.ts).getTime() < new Date(`${filters.dateFrom}T00:00:00`).getTime()) return false;
+        if (filters.dateTo && new Date(entry.ts).getTime() > new Date(`${filters.dateTo}T23:59:59`).getTime()) return false;
+        return true;
+      });
+
+      const sorters = {
+        ts: entry => new Date(entry.ts).getTime(),
+        u: entry => entry.u.toLowerCase(),
+        nm: entry => entry.nm.toLowerCase(),
+        tp: entry => entry.tp.toLowerCase(),
+        qty: entry => Math.abs(entry.qty)
+      };
+      const getter = sorters[sort.key] || sorters.ts;
+      return base.slice().sort((a, b) => {
+        const av = getter(a);
+        const bv = getter(b);
+        if (av < bv) return sort.dir === 'asc' ? -1 : 1;
+        if (av > bv) return sort.dir === 'asc' ? 1 : -1;
+        return 0;
+      });
+    },
+    dashboardStats() {
+      return state.data.items.reduce((acc, item) => {
+        acc.totalItems += 1;
+        acc.totalStock += item.stock;
+        const status = getStatusKey(item);
+        if (status === 'zero') acc.zeroCount += 1;
+        else if (status === 'crit') acc.critCount += 1;
+        else if (status === 'low') acc.lowCount += 1;
+        return acc;
+      }, { totalItems: 0, totalStock: 0, zeroCount: 0, critCount: 0, lowCount: 0 });
+    },
+    itemHistory(itemId) {
+      return state.data.history.filter(entry => entry.id === itemId).sort((a, b) => new Date(b.ts).getTime() - new Date(a.ts).getTime());
+    }
+  };
+
+  function getStatusKey(item) {
+    const stock = toNumber(item && item.stock);
+    const min = Math.max(0, toNumber(item && item.min));
+    if (stock <= 0) return 'zero';
+    if (min > 0 && stock <= Math.max(1, min * 0.3)) return 'crit';
+    if (min > 0 && stock <= min) return 'low';
+    return 'ok';
+  }
+
+  function getStatusMeta(item) {
+    return STATUS_META[getStatusKey(item)] || STATUS_META.ok;
+  }
+
+  function getStockProgress(item) {
+    if (!item || !item.min) return item && item.stock > 0 ? 100 : 0;
+    return Math.round((item.stock / item.min) * 100);
+  }
+
+  function getProjection(item) {
+    const history = selectors.itemHistory(item.id);
+    const consumptions = history.filter(entry => entry.ns < entry.os);
+    if (!consumptions.length) {
+      const estimatedDailyUse = item.min > 0 ? Math.max(1, Math.round(item.min / 14)) : 1;
+      const days = item.stock > 0 ? Math.round(item.stock / estimatedDailyUse) : 0;
+      const dateOut = days > 0 ? formatShortDate(new Date(Date.now() + days * 86400000).toISOString()) : '-';
+      return {
+        days,
+        dailyUse: `~${estimatedDailyUse}`,
+        dateOut,
+        title: days <= 7 ? 'Agotamiento inminente' : days <= 21 ? 'Stock limitado' : 'Proyección estimada',
+        subtitle: 'No hay suficiente historial real. Se usa una proyección heurística basada en el mínimo operativo.'
+      };
+    }
+
+    const dates = consumptions.map(entry => new Date(entry.ts).getTime()).filter(value => !Number.isNaN(value)).sort((a, b) => a - b);
+    const totalConsumed = consumptions.reduce((total, entry) => total + Math.abs(entry.ns - entry.os), 0);
+    const spanDays = dates.length > 1 ? Math.max(1, Math.round((dates[dates.length - 1] - dates[0]) / 86400000)) : Math.max(1, consumptions.length * 3);
+    const dailyUse = totalConsumed / spanDays || 0.1;
+    const days = item.stock > 0 ? Math.round(item.stock / dailyUse) : 0;
+    const dateOut = days > 0 ? formatShortDate(new Date(Date.now() + days * 86400000).toISOString()) : '-';
+    return {
+      days,
+      dailyUse: dailyUse < 1 ? dailyUse.toFixed(1) : Math.round(dailyUse),
+      dateOut,
+      title: days <= 7 ? 'Agotamiento inminente' : days <= 21 ? 'Pedir pronto' : days <= 45 ? 'Stock moderado' : 'Stock holgado',
+      subtitle: `Basado en ${consumptions.length} consumo${consumptions.length === 1 ? '' : 's'} reales dentro de una ventana de ${spanDays} día${spanDays === 1 ? '' : 's'}.`
+    };
+  }
+
+  function getViewTitle(screen) {
+    if (screen === 'home') return 'Panel principal';
+    if (screen === 'search') return 'Buscar';
+    if (screen === 'alerts') return 'Alertas';
+    if (screen === 'history') return 'Historial';
+    if (screen === 'report') return 'Reportes';
+    if (screen === 'newItem') return 'Nuevo producto';
+    if (screen === 'category') return state.ui.selectedCat || 'Categoría';
+    if (screen === 'subcat') return state.ui.selectedSubcat || 'Subcategoría';
+    if (screen === 'item') return selectors.selectedItem() ? selectors.selectedItem().name : 'Detalle';
+    return 'Acceso';
+  }
+
+  function getViewSubtitle(screen) {
+    if (!state.auth.user) {
+      return 'Ingresa tu PIN para continuar';
+    }
+    if (screen === 'item') {
+      const item = selectors.selectedItem();
+      return item ? `${item.cat} · ${item.subcat || 'General'}` : 'Detalle de inventario';
+    }
+    if (screen === 'category') return 'Agrupación por subcategorías';
+    if (screen === 'subcat') return 'Detalle del inventario agrupado';
+    if (screen === 'newItem') return 'Alta estructurada en stock + historial';
+    const lastSync = state.app.lastSyncAt ? ` · última sincronización ${formatDateTime(state.app.lastSyncAt)}` : '';
+    return `${state.auth.user.n}${lastSync}`;
+  }
+
+  function resolveScreen() {
+    if (!state.auth.user) return 'login';
+    if (state.ui.selectedItemId) return 'item';
+    if (state.ui.selectedCat && state.ui.selectedSubcat) return 'subcat';
+    if (state.ui.selectedCat) return 'category';
+    if (state.ui.view === 'newItem') return 'newItem';
+    return state.ui.view;
+  }
+
+  function openSheetUrl() {
+    const url = state.app.sheetUrl;
+    if (url) {
+      window.open(url, '_blank', 'noopener');
+      return;
+    }
+    pushToast('No hay URL de hoja disponible todavía', 'warning');
+  }
+
+  function generateReport() {
+    const stats = selectors.dashboardStats();
+    const alerts = selectors.alerts();
+    const grouped = selectors.categories();
+    const date = formatDateTime(new Date().toISOString());
+    const html = `
+      <!DOCTYPE html>
+      <html lang="es">
+      <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>Reporte de Inventario</title>
+        <style>
+          :root { color-scheme: light; }
+          * { box-sizing: border-box; }
+          body { font-family: Inter, ui-sans-serif, system-ui, sans-serif; margin: 0; color: #0f172a; background: #ffffff; }
+          .page { max-width: 980px; margin: 0 auto; padding: 32px; }
+          .header { display: flex; justify-content: space-between; align-items: flex-start; gap: 24px; margin-bottom: 24px; }
+          .title { font-size: 28px; font-weight: 700; margin: 0; }
+          .muted { color: #64748b; }
+          .grid { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 12px; margin: 24px 0; }
+          .card { border: 1px solid #e2e8f0; border-radius: 16px; padding: 16px; }
+          .value { font-size: 28px; font-weight: 700; }
+          .section { margin-top: 28px; }
+          table { width: 100%; border-collapse: collapse; margin-top: 12px; }
+          th, td { padding: 10px 12px; border-bottom: 1px solid #e2e8f0; text-align: left; font-size: 13px; }
+          th { color: #475569; font-size: 11px; text-transform: uppercase; letter-spacing: .08em; background: #f8fafc; }
+          .pill { display: inline-block; border-radius: 999px; padding: 4px 10px; font-size: 11px; font-weight: 700; }
+          .red { background: #fee2e2; color: #991b1b; }
+          .amber { background: #fef3c7; color: #92400e; }
+          .green { background: #dcfce7; color: #166534; }
+          .actions { margin-bottom: 20px; }
+          .actions button { border: none; background: #0f172a; color: white; padding: 12px 18px; border-radius: 999px; font-weight: 600; cursor: pointer; }
+          @media print { .actions { display: none; } .page { padding: 0; } }
+        </style>
+      </head>
+      <body>
+        <div class="page">
+          <div class="actions"><button onclick="window.print()">Imprimir / Guardar PDF</button></div>
+          <div class="header">
+            <div>
+              <h1 class="title">Reporte de inventario</h1>
+              <p class="muted">${escapeHtml(state.app.title)} · ${escapeHtml(date)}</p>
+            </div>
+            <div class="muted">Usuario: ${escapeHtml(state.auth.user ? state.auth.user.n : 'Sistema')}</div>
+          </div>
+          <div class="grid">
+            <div class="card"><div class="value">${stats.totalItems}</div><div class="muted">Productos</div></div>
+            <div class="card"><div class="value">${formatNumber(stats.totalStock)}</div><div class="muted">Unidades</div></div>
+            <div class="card"><div class="value">${stats.zeroCount + stats.critCount}</div><div class="muted">Críticos</div></div>
+            <div class="card"><div class="value">${stats.lowCount}</div><div class="muted">Bajo mínimo</div></div>
+          </div>
+          <div class="section">
+            <h2>Alertas operativas</h2>
+            <table>
+              <thead>
+                <tr><th>Producto</th><th>Categoría</th><th>Stock</th><th>Mínimo</th><th>Estado</th><th>Proyección</th></tr>
+              </thead>
+              <tbody>
+                ${alerts.map(item => {
+                  const status = getStatusKey(item);
+                  const projection = getProjection(item);
+                  const pillClass = status === 'ok' ? 'green' : status === 'low' ? 'amber' : 'red';
+                  return `<tr>
+                    <td>${escapeHtml(item.name)}</td>
+                    <td>${escapeHtml(item.cat)} · ${escapeHtml(item.subcat || 'General')}</td>
+                    <td>${formatNumber(item.stock)} ${escapeHtml(item.unit)}</td>
+                    <td>${formatNumber(item.min)}</td>
+                    <td><span class="pill ${pillClass}">${escapeHtml(getStatusMeta(item).label)}</span></td>
+                    <td>${escapeHtml(String(projection.days))} días</td>
+                  </tr>`;
+                }).join('') || '<tr><td colspan="6">No hay alertas activas.</td></tr>'}
+              </tbody>
+            </table>
+          </div>
+          <div class="section">
+            <h2>Resumen por categoría</h2>
+            <table>
+              <thead>
+                <tr><th>Categoría</th><th>Productos</th><th>Unidades</th><th>Agotados</th><th>Críticos</th><th>Bajos</th></tr>
+              </thead>
+              <tbody>
+                ${grouped.map(group => `<tr>
+                  <td>${escapeHtml(group.name)}</td>
+                  <td>${group.count}</td>
+                  <td>${formatNumber(group.totalStock)}</td>
+                  <td>${group.zeroCount}</td>
+                  <td>${group.critCount}</td>
+                  <td>${group.lowCount}</td>
+                </tr>`).join('')}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </body>
+      </html>
+    `;
+
+    const reportWindow = window.open('', '_blank', 'noopener,noreferrer');
+    if (reportWindow) {
+      reportWindow.document.write(html);
+      reportWindow.document.close();
+      pushToast('Reporte abierto en nueva pestaña', 'success');
+      return;
+    }
+
+    const blob = new Blob([html], { type: 'text/html' });
+    const url = URL.createObjectURL(blob);
+    const anchor = document.createElement('a');
+    anchor.href = url;
+    anchor.download = `reporte_inventario_${new Date().toISOString().slice(0, 10)}.html`;
+    anchor.click();
+    URL.revokeObjectURL(url);
+    pushToast('No se pudo abrir la ventana. Se descargó el HTML del reporte.', 'warning');
+  }
+
+  function pushToast(message, tone) {
+    state.ui.toast = { message, tone: tone || 'success' };
+    clearTimeout(toastTimer);
+    renderToast();
+    toastTimer = setTimeout(() => {
+      state.ui.toast = null;
+      renderToast();
+    }, 2800);
+  }
+
+  function refreshIcons() {
+    if (window.lucide && typeof window.lucide.createIcons === 'function') {
+      window.lucide.createIcons();
+    }
+  }
+
+  function runPostRenderFocus(preferredId) {
+    const focusId = preferredId || (state.ui.dialog ? 'movement-quantity' : (!state.auth.user ? 'pin-input' : state.ui.view === 'search' && !state.ui.selectedCat ? 'search-input' : ''));
+    if (!focusId) {
+      return;
+    }
+    requestAnimationFrame(() => {
+      const element = document.getElementById(focusId);
+      if (element) {
+        element.focus();
+      }
+    });
+  }
+
+  const bridge = {
+    call(method, payload) {
+      if (!IS_GAS) {
+        return Promise.resolve(null);
+      }
+      return new Promise((resolve, reject) => {
+        let runner = google.script.run
+          .withSuccessHandler(resolve)
+          .withFailureHandler(reject);
+        if (typeof payload === 'undefined') {
+          runner[method]();
+        } else {
+          runner[method](payload);
+        }
+      });
+    }
+  };
+
+  const storage = {
+    resolveStore(key) {
+      return key === STORAGE_KEYS.session ? sessionStorage : localStorage;
+    },
+    read(key, fallback) {
+      try {
+        const value = this.resolveStore(key).getItem(key);
+        return value ? JSON.parse(value) : fallback;
+      } catch (error) {
+        return fallback;
+      }
+    },
+    write(key, value) {
+      try {
+        this.resolveStore(key).setItem(key, JSON.stringify(value));
+      } catch (error) {
+        // noop
+      }
+    },
+    clear(key) {
+      try {
+        this.resolveStore(key).removeItem(key);
+      } catch (error) {
+        // noop
+      }
+    },
+    writeSession(value) {
+      this.write(STORAGE_KEYS.session, value);
+    }
+  };
+
+  function defaultNewItemForm() {
+    return { name: '', cat: '', subcat: '', stock: '0', min: '0', unit: 'uds', comment: '' };
+  }
+
+  function defaultMovementForm() {
+    return { quantity: '', note: '' };
+  }
+
+  function defaultHistoryFilters() {
+    return { search: '', user: '', cat: '', subcat: '', dateFrom: '', dateTo: '' };
+  }
+
+  function normalizeDate(value) {
+    if (!value) return new Date().toISOString();
+    const parsed = new Date(value);
+    return Number.isNaN(parsed.getTime()) ? new Date().toISOString() : parsed.toISOString();
+  }
+
+  function toNumber(value) {
+    const number = Number(value);
+    return Number.isFinite(number) ? number : 0;
+  }
+
+  function formatNumber(value) {
+    return toNumber(value).toLocaleString('es-CL');
+  }
+
+  function formatDateTime(value) {
+    const date = new Date(value);
+    if (Number.isNaN(date.getTime())) return String(value || '');
+    const day = String(date.getDate()).padStart(2, '0');
+    const month = String(date.getMonth() + 1).padStart(2, '0');
+    const year = date.getFullYear();
+    const hour = String(date.getHours()).padStart(2, '0');
+    const minute = String(date.getMinutes()).padStart(2, '0');
+    return `${day}/${month}/${year} ${hour}:${minute}`;
+  }
+
+  function formatShortDate(value) {
+    const date = new Date(value);
+    if (Number.isNaN(date.getTime())) return '-';
+    const day = String(date.getDate()).padStart(2, '0');
+    const month = String(date.getMonth() + 1).padStart(2, '0');
+    return `${day}/${month}`;
+  }
+
+  function categoryMeta(name) {
+    return CATEGORY_META[name] || { icon: 'package', tone: 'bg-slate-200 text-slate-700' };
+  }
+
+  function initialsFor(name) {
+    return String(name || '')
+      .split(/\s+/)
+      .filter(Boolean)
+      .slice(0, 2)
+      .map(part => part[0].toUpperCase())
+      .join('') || 'U';
+  }
+
+  function highlight(text, query) {
+    const safeText = escapeHtml(text || '');
+    const safeQuery = String(query || '').trim();
+    if (!safeQuery) return safeText;
+    const pattern = new RegExp(`(${escapeRegExp(safeQuery)})`, 'ig');
+    return safeText.replace(pattern, '<mark class="rounded bg-amber-100 px-1 text-foreground">$1</mark>');
+  }
+
+  function escapeHtml(value) {
+    return String(value == null ? '' : value)
+      .replace(/&/g, '&amp;')
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;')
+      .replace(/"/g, '&quot;')
+      .replace(/'/g, '&#39;');
+  }
+
+  function escapeRegExp(value) {
+    return value.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+  }
+
+  return { init };
+})();
+
+document.addEventListener('DOMContentLoaded', () => {
+  KawasStockApp.init();
+});
+
+  </script>
+</body>
+</html>
