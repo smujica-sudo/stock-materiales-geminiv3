@@ -9,13 +9,13 @@
   <meta name="theme-color" content="#FAF9FD">
   <title>Kawas Stock Pro</title>
 
-  <!-- Preconnect para forzar descarga de fuentes -->
+  <!-- Preconnect para priorizar la descarga de la fuente -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   
-  <!-- Google Fonts & Material Symbols (Estricto M3) -->
+  <!-- Google Fonts & Material Symbols (display=block evita el pestañeo inicial) -->
   <link href="https://fonts.googleapis.com/css2?family=Google+Sans:wght@400;500;700&family=Roboto:wght@400;500;700&family=Roboto+Mono:wght@400;500;700&display=swap" rel="stylesheet">
-  <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@24,400,0..1,0&display=block" rel="stylesheet" />
 
   <!-- Tailwind CSS -->
   <script src="https://cdn.tailwindcss.com"></script>
@@ -66,41 +66,46 @@
     }
   </script>
 
+  <!-- INYECCIÓN TAILWIND: Evita que el CDN destruya los estilos asíncronamente -->
+  <style type="text/tailwindcss">
+    @layer base {
+      html, body { height: 100%; overflow: hidden; overscroll-behavior-y: none; -webkit-tap-highlight-color: transparent; }
+      input[type=number]::-webkit-inner-spin-button { -webkit-appearance: none; }
+      .no-scrollbar::-webkit-scrollbar { display: none; }
+      .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+    }
+    
+    @layer components {
+      /* Reglas estrictas blindadas contra el Preflight de Tailwind */
+      .material-symbols-rounded { 
+        font-family: 'Material Symbols Rounded' !important;
+        font-weight: normal !important;
+        font-style: normal !important;
+        font-size: 24px;
+        line-height: 1 !important;
+        letter-spacing: normal !important;
+        text-transform: none !important;
+        display: inline-block; 
+        white-space: nowrap !important;
+        word-wrap: normal !important;
+        direction: ltr;
+        -webkit-font-smoothing: antialiased !important;
+        font-feature-settings: 'liga' !important;
+        font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24 !important; 
+      }
+      .icon-fill { 
+        font-variation-settings: 'FILL' 1, 'wght' 400, 'GRAD' 0, 'opsz' 24 !important; 
+      }
+      
+      .overlay-enter { transform: translateX(100%); opacity: 0; }
+      .overlay-enter-active { transform: translateX(0); opacity: 1; transition: all 0.3s cubic-bezier(0.2, 0, 0, 1); }
+      .overlay-exit { transform: translateX(0); opacity: 1; }
+      .overlay-exit-active { transform: translateX(100%); opacity: 0; transition: all 0.3s cubic-bezier(0.2, 0, 0, 1); }
+    }
+  </style>
+  
   <style>
-    /* Optimizaciones estructurales */
-    html, body { height: 100%; overflow: hidden; overscroll-behavior-y: none; -webkit-tap-highlight-color: transparent; }
-    input[type=number]::-webkit-inner-spin-button { -webkit-appearance: none; }
-    .no-scrollbar::-webkit-scrollbar { display: none; }
-    .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
-    
-    /* Reglas estrictas de Iconos M3 (Prioridad Absoluta) */
-    .material-symbols-rounded { 
-      font-family: 'Material Symbols Rounded' !important;
-      font-weight: normal !important;
-      font-style: normal !important;
-      font-size: 24px;
-      line-height: 1 !important;
-      letter-spacing: normal !important;
-      text-transform: none !important;
-      display: inline-block; 
-      white-space: nowrap !important;
-      word-wrap: normal !important;
-      direction: ltr;
-      -webkit-font-smoothing: antialiased !important;
-      -webkit-font-feature-settings: 'liga' !important;
-      font-feature-settings: 'liga' !important;
-      font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24 !important; 
-    }
-    .icon-fill { 
-      font-variation-settings: 'FILL' 1, 'wght' 400, 'GRAD' 0, 'opsz' 24 !important; 
-    }
-    
-    /* Transiciones de Overlays */
-    .overlay-enter { transform: translateX(100%); opacity: 0; }
-    .overlay-enter-active { transform: translateX(0); opacity: 1; transition: all 0.3s cubic-bezier(0.2, 0, 0, 1); }
-    .overlay-exit { transform: translateX(0); opacity: 1; }
-    .overlay-exit-active { transform: translateX(100%); opacity: 0; transition: all 0.3s cubic-bezier(0.2, 0, 0, 1); }
-
+    /* Animaciones CSS puro para mejor rendimiento */
     @keyframes fadeUp { from { opacity: 0; transform: translateY(12px); } to { opacity: 1; transform: translateY(0); } }
     .stagger-item { animation: fadeUp 0.35s cubic-bezier(0.2, 0, 0, 1) both; }
     
@@ -201,7 +206,6 @@
               <div id="home-total-stock" class="text-5xl md:text-7xl font-light text-m3-onSurface font-mono tracking-tight mb-4 md:mb-0">0</div>
             </div>
             <div class="grid grid-cols-3 gap-3 md:gap-6 md:w-1/2">
-              <!-- KPIs navegables (con hover y cursor-pointer) -->
               <div onclick="app.switchTab('home')" class="bg-m3-surfaceContainer px-3 py-2 md:p-4 rounded-2xl md:rounded-3xl cursor-pointer active:scale-95 hover:bg-m3-surfaceContainerHigh transition-all">
                 <div id="home-kpi-ok" class="text-xl md:text-3xl font-medium text-m3-success font-mono">0</div><div class="text-[10px] md:text-xs text-m3-onSurfaceVariant uppercase mt-1">Óptimos</div>
               </div>
@@ -478,7 +482,6 @@
         localStorage.setItem('kawas_pro_data', JSON.stringify({items: this.state.items, hist: this.state.hist}));
       },
 
-      /* CORRECCIÓN: Agregando correctamente los parámetros 'opts' a la URL para el Historial */
       async fetchAPI(action, opts = {}) {
         const url = new URL(API_URL); 
         url.searchParams.append('action', action);
@@ -514,7 +517,6 @@
       async sync(manual = false) {
         if(manual) { this.toast("Sincronizando...", "ok"); document.getElementById('sync-icon').classList.add('animate-spin'); }
         try {
-          /* CORRECCIÓN: Promesas separadas con catch individual para que una no rompa la otra */
           const [iRes, hRes] = await Promise.all([
             this.fetchAPI('getAll').catch(e => ({error: true})), 
             this.fetchAPI('getHistory', {limit: 100}).catch(e => ({error: true}))
