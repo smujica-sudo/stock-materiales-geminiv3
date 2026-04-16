@@ -631,7 +631,7 @@ const KawasStockApp = (() => {
     },
     auth: {
       user: null,
-      pin: '',
+      pin: '1234',
       error: ''
     },
     data: {
@@ -1028,13 +1028,13 @@ const KawasStockApp = (() => {
   }
 
   function renderLoginView() {
-    const pin = state.auth.pin || '';
+    const pin = state.auth.pin || '1234';
     const availableUsers = (state.data.users.length ? state.data.users : DEMO_USERS)
       .map(entry => entry.n)
       .filter(Boolean)
       .join(' · ');
     const cells = Array.from({ length: 4 }, (_, index) => {
-      const filled = pin[index] || '';
+      const filled = pin[index] || '1234';
       const active = index === pin.length && pin.length < 4;
       return `
         <div class="otp-cell ${filled ? 'otp-cell-filled' : ''} ${active ? 'otp-cell-active' : ''}">
