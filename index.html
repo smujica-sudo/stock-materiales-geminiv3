@@ -63,7 +63,7 @@
   </script>
 
   <style>
-    /* Optimizaciones estructurales mínimas y fluidas */
+    /* Optimizaciones estructurales */
     html, body { height: 100%; overflow: hidden; overscroll-behavior-y: none; -webkit-tap-highlight-color: transparent; }
     input[type=number]::-webkit-inner-spin-button { -webkit-appearance: none; }
     .no-scrollbar::-webkit-scrollbar { display: none; }
@@ -71,7 +71,7 @@
     
     .icon-fill { font-variation-settings: 'FILL' 1; }
     
-    /* Transiciones de Overlays y Listas */
+    /* Transiciones de Overlays */
     .overlay-enter { transform: translateX(100%); opacity: 0; }
     .overlay-enter-active { transform: translateX(0); opacity: 1; transition: all 0.3s cubic-bezier(0.2, 0, 0, 1); }
     .overlay-exit { transform: translateX(0); opacity: 1; }
@@ -88,248 +88,272 @@
     .animate-snackbar { animation: slideUpFade 3s cubic-bezier(0.2, 0, 0, 1) forwards; }
   </style>
 </head>
-<body class="bg-m3-surface text-m3-onSurface antialiased selection:bg-m3-primaryContainer flex flex-col items-center">
+<body class="bg-m3-surface text-m3-onSurface antialiased selection:bg-m3-primaryContainer flex flex-col">
 
   <!-- ==================== PANTALLA LOGIN ==================== -->
-  <div id="view-login" class="absolute inset-0 z-50 bg-m3-surface flex flex-col items-center justify-center p-8 w-full max-w-md mx-auto transition-opacity duration-300">
-    <div class="w-20 h-20 rounded-[24px] bg-m3-primaryContainer text-m3-onPrimaryContainer flex items-center justify-center mb-6 shadow-m3-1">
-      <span class="material-symbols-rounded text-4xl">inventory_2</span>
+  <div id="view-login" class="absolute inset-0 z-50 bg-m3-surface flex flex-col items-center justify-center p-8 w-full transition-opacity duration-300">
+    <div class="md:bg-m3-surfaceContainerLow md:p-12 md:rounded-[32px] md:shadow-sm flex flex-col items-center w-full max-w-md">
+      <div class="w-20 h-20 rounded-[24px] bg-m3-primaryContainer text-m3-onPrimaryContainer flex items-center justify-center mb-6 shadow-m3-1">
+        <span class="material-symbols-rounded text-4xl">inventory_2</span>
+      </div>
+      <h1 class="text-3xl font-display font-medium mb-2 text-m3-onSurface">Kawas Stock</h1>
+      <p id="login-hint" class="text-m3-onSurfaceVariant text-sm mb-12 text-center">Iniciando sistema...</p>
+      
+      <div class="w-full bg-m3-surfaceContainerHighest rounded-t-xl border-b-2 border-m3-primary px-4 pt-3 pb-2 relative mb-2">
+        <label class="text-xs text-m3-onSurfaceVariant font-medium">PIN de Acceso</label>
+        <input id="inp-pin" type="password" inputmode="numeric" maxlength="4" disabled class="w-full bg-transparent outline-none text-center tracking-[1em] text-3xl font-mono mt-1 text-m3-onSurface">
+      </div>
+      <div id="login-error" class="text-m3-error text-sm mt-2 h-5 opacity-0 transition-opacity font-medium">PIN incorrecto</div>
+      <div id="login-pills" class="flex flex-wrap justify-center gap-2 mt-8 w-full"></div>
     </div>
-    <h1 class="text-3xl font-display font-medium mb-2 text-m3-onSurface">Kawas Stock</h1>
-    <p id="login-hint" class="text-m3-onSurfaceVariant text-sm mb-12 text-center">Iniciando sistema...</p>
-    
-    <div class="w-64 bg-m3-surfaceContainerHighest rounded-t-xl border-b-2 border-m3-primary px-4 pt-3 pb-2 relative mb-2">
-      <label class="text-xs text-m3-onSurfaceVariant font-medium">PIN de Acceso</label>
-      <input id="inp-pin" type="password" inputmode="numeric" maxlength="4" disabled class="w-full bg-transparent outline-none text-center tracking-[1em] text-3xl font-mono mt-1 text-m3-onSurface">
-    </div>
-    <div id="login-error" class="text-m3-error text-sm mt-2 h-5 opacity-0 transition-opacity font-medium">PIN incorrecto</div>
-    <div id="login-pills" class="flex flex-wrap justify-center gap-2 mt-8"></div>
   </div>
 
-  <!-- ==================== APP SHELL PRINCIPAL ==================== -->
-  <div id="app-shell" class="w-full max-w-md h-full flex flex-col relative hidden">
+  <!-- ==================== APP SHELL RESPONSIVO (Móvil & Escritorio) ==================== -->
+  <!-- En móvil: flex-col (nav abajo). En Escritorio: flex-row (nav a la izquierda) -->
+  <div id="app-shell" class="w-full h-full flex flex-col md:flex-row relative hidden bg-m3-surface">
     
-    <!-- Top App Bar -->
-    <header class="h-16 flex items-center px-4 gap-4 shrink-0 bg-m3-surface z-10">
-      <div class="w-10 h-10 rounded-full bg-m3-primaryContainer text-m3-onPrimaryContainer flex items-center justify-center shrink-0">
-        <span class="material-symbols-rounded text-xl" id="header-icon">inventory_2</span>
-      </div>
-      <div class="flex-1 min-w-0">
-        <h1 id="header-title" class="text-xl font-display font-medium text-m3-onSurface truncate">Inicio</h1>
-        <p id="header-subtitle" class="text-xs text-m3-onSurfaceVariant truncate hidden"></p>
-      </div>
-      <button onclick="app.sync(true)" class="w-10 h-10 rounded-full flex items-center justify-center hover:bg-m3-surfaceContainer active:bg-m3-surfaceVariant transition-colors">
-        <span id="sync-icon" class="material-symbols-rounded text-m3-onSurfaceVariant">sync</span>
-      </button>
-    </header>
-
-    <!-- Contenedor Principal de Vistas -->
-    <main id="main-content" class="flex-1 overflow-y-auto overflow-x-hidden relative no-scrollbar pb-6 px-4">
-      
-      <!-- Tab 1: Inicio -->
-      <section id="tab-home" class="w-full h-full flex flex-col py-2 transition-transform">
-        <div class="bg-m3-surfaceContainerLow rounded-3xl p-5 mb-6 border-t-4 border-m3-primary shadow-sm">
-          <div class="flex items-center justify-between mb-4">
-            <span class="text-xs font-medium text-m3-onSurfaceVariant uppercase tracking-wider">Stock Global</span>
-            <span id="home-user" class="inline-flex items-center gap-1 bg-m3-surfaceContainerHigh px-2 py-1 rounded-full text-xs font-medium"><span class="material-symbols-rounded text-[14px]">person</span>Usuario</span>
-          </div>
-          <div id="home-total-stock" class="text-5xl font-light text-m3-onSurface font-mono tracking-tight mb-4">0</div>
-          <div class="grid grid-cols-3 gap-3">
-            <div class="bg-m3-surfaceContainer px-3 py-2 rounded-2xl">
-              <div id="home-kpi-ok" class="text-xl font-medium text-m3-success font-mono">0</div><div class="text-[10px] text-m3-onSurfaceVariant uppercase">Óptimos</div>
-            </div>
-            <div class="bg-m3-surfaceContainer px-3 py-2 rounded-2xl">
-              <div id="home-kpi-low" class="text-xl font-medium text-m3-warning font-mono">0</div><div class="text-[10px] text-m3-onSurfaceVariant uppercase">Bajos</div>
-            </div>
-            <div class="bg-m3-surfaceContainer px-3 py-2 rounded-2xl">
-              <div id="home-kpi-crit" class="text-xl font-medium text-m3-error font-mono">0</div><div class="text-[10px] text-m3-onSurfaceVariant uppercase">Críticos</div>
-            </div>
-          </div>
-        </div>
-        <div class="text-sm font-medium text-m3-onSurfaceVariant tracking-wider uppercase mb-3 px-1">Categorías</div>
-        <div id="home-categories" class="grid grid-cols-2 gap-3"></div>
-      </section>
-
-      <!-- Tab 2: Búsqueda -->
-      <section id="tab-search" class="w-full h-full hidden flex-col py-2">
-        <div class="bg-m3-surfaceContainerHigh h-14 rounded-full flex items-center px-4 gap-3 mb-4 shrink-0">
-          <span class="material-symbols-rounded text-m3-onSurfaceVariant">search</span>
-          <input id="inp-search" type="text" placeholder="Buscar producto..." class="flex-1 bg-transparent outline-none text-m3-onSurface text-base">
-          <button id="btn-clear-search" class="hidden text-m3-onSurfaceVariant"><span class="material-symbols-rounded text-xl">close</span></button>
-        </div>
-        <div id="search-results" class="flex flex-col"></div>
-      </section>
-
-      <!-- Tab 3: Alertas -->
-      <section id="tab-alerts" class="w-full h-full hidden flex-col py-2">
-        <div id="alerts-list" class="flex flex-col"></div>
-      </section>
-
-      <!-- Tab 4: Historial -->
-      <section id="tab-history" class="w-full h-full hidden flex-col py-2">
-        <div id="history-list" class="flex flex-col"></div>
-      </section>
-
-      <!-- Tab 5: Reporte -->
-      <section id="tab-report" class="w-full h-full hidden flex-col py-2">
-        <div class="bg-m3-surfaceContainer rounded-3xl p-6 mb-4 text-center">
-          <div class="w-16 h-16 bg-m3-primaryContainer text-m3-primary rounded-full flex items-center justify-center mx-auto mb-4">
-            <span class="material-symbols-rounded text-3xl">picture_as_pdf</span>
-          </div>
-          <h2 class="text-xl font-display font-medium mb-2">Exportar Inventario</h2>
-          <p class="text-sm text-m3-onSurfaceVariant mb-6">Genera un reporte consolidado con proyecciones y estado actual.</p>
-          <button onclick="app.generatePDF()" class="w-full h-12 bg-m3-primary text-m3-onPrimary rounded-full font-medium shadow-sm active:scale-95 transition-transform flex items-center justify-center gap-2">
-            <span class="material-symbols-rounded">download</span> Descargar PDF
-          </button>
-          <button onclick="window.open(SHEET_URL, '_blank')" class="w-full h-12 bg-transparent text-m3-primary rounded-full font-medium mt-2 active:bg-m3-primaryContainer/30 transition-colors">
-            Abrir Base de Datos
-          </button>
-        </div>
-      </section>
-
-    </main>
-
-    <!-- Bottom Navigation Bar -->
-    <nav class="h-20 bg-m3-surfaceContainer grid grid-cols-5 pb-[env(safe-area-inset-bottom)] shrink-0 z-20 shadow-[0_-1px_3px_rgba(0,0,0,0.05)]">
-      <button class="nav-btn flex flex-col items-center justify-center gap-1 text-m3-onSurfaceVariant group active" data-tab="home">
-        <div class="w-14 h-8 rounded-full flex items-center justify-center indicator group-[.active]:bg-m3-secondaryContainer group-[.active]:text-m3-onSecondaryContainer transition-colors">
+    <!-- NAVIGATION: Bottom Nav (Mobile) -> Navigation Rail (Desktop) -->
+    <nav class="order-last md:order-first h-20 md:h-full md:w-[96px] bg-m3-surfaceContainer md:bg-m3-surface grid grid-cols-5 md:flex md:flex-col md:justify-start md:pt-6 md:gap-4 pb-[env(safe-area-inset-bottom)] shrink-0 z-20 shadow-[0_-1px_3px_rgba(0,0,0,0.05)] md:shadow-none md:border-r md:border-m3-surfaceVariant">
+      <button class="nav-btn flex flex-col items-center justify-center gap-1 md:gap-1.5 text-m3-onSurfaceVariant group active w-full md:py-2" data-tab="home">
+        <div class="w-14 h-8 md:w-14 md:h-10 rounded-full flex items-center justify-center indicator group-[.active]:bg-m3-secondaryContainer group-[.active]:text-m3-onSecondaryContainer transition-colors">
           <span class="material-symbols-rounded group-[.active]:icon-fill">home</span>
         </div>
-        <span class="text-[11px] font-medium group-[.active]:font-bold group-[.active]:text-m3-onSurface">Inicio</span>
+        <span class="text-[11px] md:text-xs font-medium group-[.active]:font-bold group-[.active]:text-m3-onSurface">Inicio</span>
       </button>
-      <button class="nav-btn flex flex-col items-center justify-center gap-1 text-m3-onSurfaceVariant group" data-tab="search">
-        <div class="w-14 h-8 rounded-full flex items-center justify-center indicator group-[.active]:bg-m3-secondaryContainer group-[.active]:text-m3-onSecondaryContainer transition-colors">
+      <button class="nav-btn flex flex-col items-center justify-center gap-1 md:gap-1.5 text-m3-onSurfaceVariant group w-full md:py-2" data-tab="search">
+        <div class="w-14 h-8 md:w-14 md:h-10 rounded-full flex items-center justify-center indicator group-[.active]:bg-m3-secondaryContainer group-[.active]:text-m3-onSecondaryContainer transition-colors">
           <span class="material-symbols-rounded group-[.active]:icon-fill">search</span>
         </div>
-        <span class="text-[11px] font-medium group-[.active]:font-bold group-[.active]:text-m3-onSurface">Buscar</span>
+        <span class="text-[11px] md:text-xs font-medium group-[.active]:font-bold group-[.active]:text-m3-onSurface">Buscar</span>
       </button>
-      <button class="nav-btn flex flex-col items-center justify-center gap-1 text-m3-onSurfaceVariant group relative" data-tab="alerts">
-        <div id="badge-alerts" class="absolute top-2 right-3 w-2 h-2 bg-m3-error rounded-full hidden"></div>
-        <div class="w-14 h-8 rounded-full flex items-center justify-center indicator group-[.active]:bg-m3-secondaryContainer group-[.active]:text-m3-onSecondaryContainer transition-colors">
+      <button class="nav-btn flex flex-col items-center justify-center gap-1 md:gap-1.5 text-m3-onSurfaceVariant group relative w-full md:py-2" data-tab="alerts">
+        <div id="badge-alerts" class="absolute top-2 right-3 md:right-6 w-2 h-2 bg-m3-error rounded-full hidden"></div>
+        <div class="w-14 h-8 md:w-14 md:h-10 rounded-full flex items-center justify-center indicator group-[.active]:bg-m3-secondaryContainer group-[.active]:text-m3-onSecondaryContainer transition-colors">
           <span class="material-symbols-rounded group-[.active]:icon-fill">warning</span>
         </div>
-        <span class="text-[11px] font-medium group-[.active]:font-bold group-[.active]:text-m3-onSurface">Alertas</span>
+        <span class="text-[11px] md:text-xs font-medium group-[.active]:font-bold group-[.active]:text-m3-onSurface">Alertas</span>
       </button>
-      <button class="nav-btn flex flex-col items-center justify-center gap-1 text-m3-onSurfaceVariant group" data-tab="history">
-        <div class="w-14 h-8 rounded-full flex items-center justify-center indicator group-[.active]:bg-m3-secondaryContainer group-[.active]:text-m3-onSecondaryContainer transition-colors">
+      <button class="nav-btn flex flex-col items-center justify-center gap-1 md:gap-1.5 text-m3-onSurfaceVariant group w-full md:py-2" data-tab="history">
+        <div class="w-14 h-8 md:w-14 md:h-10 rounded-full flex items-center justify-center indicator group-[.active]:bg-m3-secondaryContainer group-[.active]:text-m3-onSecondaryContainer transition-colors">
           <span class="material-symbols-rounded group-[.active]:icon-fill">history</span>
         </div>
-        <span class="text-[11px] font-medium group-[.active]:font-bold group-[.active]:text-m3-onSurface">Historial</span>
+        <span class="text-[11px] md:text-xs font-medium group-[.active]:font-bold group-[.active]:text-m3-onSurface">Historial</span>
       </button>
-      <button class="nav-btn flex flex-col items-center justify-center gap-1 text-m3-onSurfaceVariant group" data-tab="report">
-        <div class="w-14 h-8 rounded-full flex items-center justify-center indicator group-[.active]:bg-m3-secondaryContainer group-[.active]:text-m3-onSecondaryContainer transition-colors">
+      <button class="nav-btn flex flex-col items-center justify-center gap-1 md:gap-1.5 text-m3-onSurfaceVariant group w-full md:py-2" data-tab="report">
+        <div class="w-14 h-8 md:w-14 md:h-10 rounded-full flex items-center justify-center indicator group-[.active]:bg-m3-secondaryContainer group-[.active]:text-m3-onSecondaryContainer transition-colors">
           <span class="material-symbols-rounded group-[.active]:icon-fill">description</span>
         </div>
-        <span class="text-[11px] font-medium group-[.active]:font-bold group-[.active]:text-m3-onSurface">Reporte</span>
+        <span class="text-[11px] md:text-xs font-medium group-[.active]:font-bold group-[.active]:text-m3-onSurface">Reporte</span>
       </button>
     </nav>
-  </div>
 
-  <!-- ==================== OVERLAYS (Deep Navigation) ==================== -->
-  
-  <!-- Overlay: Categoría / Subcategorías -->
-  <div id="view-category" class="absolute inset-0 z-30 bg-m3-surface w-full max-w-md mx-auto flex flex-col overlay-enter hidden">
-    <header class="h-16 flex items-center px-2 shrink-0 bg-m3-surface border-b border-m3-surfaceVariant">
-      <button onclick="app.closeOverlay('category')" class="w-12 h-12 rounded-full flex items-center justify-center active:bg-m3-surfaceVariant text-m3-onSurfaceVariant">
-        <span class="material-symbols-rounded">arrow_back</span>
-      </button>
-      <div class="flex-1 min-w-0 ml-1">
-        <h1 id="cat-title" class="text-lg font-display font-medium text-m3-onSurface truncate">Categoría</h1>
-        <p id="cat-subtitle" class="text-xs text-m3-onSurfaceVariant truncate"></p>
-      </div>
-    </header>
-    <main class="flex-1 overflow-y-auto no-scrollbar"><div id="cat-list" class="flex flex-col py-2 px-4 gap-2"></div></main>
-  </div>
+    <!-- ÁREA DERECHA: Contiene el Header, Main Content y los Overlays -->
+    <div class="flex-1 flex flex-col relative min-w-0 overflow-hidden bg-m3-surface">
+      
+      <!-- Top App Bar -->
+      <header class="h-16 flex items-center px-4 md:px-8 gap-4 shrink-0 bg-m3-surface z-10 md:border-b md:border-m3-surfaceVariant/50">
+        <div class="md:hidden w-10 h-10 rounded-full bg-m3-primaryContainer text-m3-onPrimaryContainer flex items-center justify-center shrink-0">
+          <span class="material-symbols-rounded text-xl" id="header-icon">inventory_2</span>
+        </div>
+        <div class="flex-1 min-w-0">
+          <h1 id="header-title" class="text-xl md:text-2xl font-display font-medium text-m3-onSurface truncate">Inicio</h1>
+          <p id="header-subtitle" class="text-xs text-m3-onSurfaceVariant truncate hidden"></p>
+        </div>
+        <button onclick="app.sync(true)" class="w-10 h-10 rounded-full flex items-center justify-center hover:bg-m3-surfaceContainer active:bg-m3-surfaceVariant transition-colors">
+          <span id="sync-icon" class="material-symbols-rounded text-m3-onSurfaceVariant">sync</span>
+        </button>
+      </header>
 
-  <!-- Overlay: Lista de Productos -->
-  <div id="view-subcat" class="absolute inset-0 z-40 bg-m3-surface w-full max-w-md mx-auto flex flex-col overlay-enter hidden">
-    <header class="h-16 flex items-center px-2 shrink-0 bg-m3-surface border-b border-m3-surfaceVariant">
-      <button onclick="app.closeOverlay('subcat')" class="w-12 h-12 rounded-full flex items-center justify-center active:bg-m3-surfaceVariant text-m3-onSurfaceVariant">
-        <span class="material-symbols-rounded">arrow_back</span>
-      </button>
-      <div class="flex-1 min-w-0 ml-1">
-        <h1 id="subcat-title" class="text-lg font-display font-medium text-m3-onSurface truncate">Productos</h1>
-        <p id="subcat-subtitle" class="text-xs text-m3-onSurfaceVariant truncate"></p>
-      </div>
-    </header>
-    <main class="flex-1 overflow-y-auto no-scrollbar"><div id="subcat-list" class="flex flex-col py-2"></div></main>
-  </div>
-
-  <!-- Overlay: Detalle de Item -->
-  <div id="view-item" class="absolute inset-0 z-50 bg-m3-surface w-full max-w-md mx-auto flex flex-col overlay-enter hidden">
-    <header class="h-16 flex items-center px-2 shrink-0 bg-m3-surface">
-      <button onclick="app.closeOverlay('item')" class="w-12 h-12 rounded-full flex items-center justify-center active:bg-m3-surfaceVariant text-m3-onSurfaceVariant">
-        <span class="material-symbols-rounded">arrow_back</span>
-      </button>
-      <div class="flex-1 min-w-0 ml-1">
-        <h1 id="item-title" class="text-lg font-display font-medium text-m3-onSurface truncate leading-tight">Nombre</h1>
-        <p id="item-subtitle" class="text-xs text-m3-onSurfaceVariant truncate leading-tight mt-[1px]">Categoría</p>
-      </div>
-    </header>
-    <main class="flex-1 overflow-y-auto no-scrollbar px-4 pb-4 flex flex-col">
-      <!-- Tarjeta Stock -->
-      <div class="bg-m3-surfaceContainerLow rounded-3xl p-6 text-center border-t-4 border-m3-primary mb-4 mt-2">
-        <div class="text-xs font-medium text-m3-onSurfaceVariant tracking-widest uppercase mb-1">Stock Actual</div>
-        <div id="item-stock" class="text-6xl font-light text-m3-primary font-mono tracking-tight mb-2">0</div>
-        <div id="item-unit" class="text-m3-onSurfaceVariant text-sm mb-4">unidades</div>
-        <div id="item-status-chip" class="inline-flex items-center gap-1.5 px-4 py-1.5 rounded-full text-sm font-medium"></div>
-        <div class="mt-4 bg-m3-surfaceContainerHigh h-2 rounded-full overflow-hidden"><div id="item-progress" class="h-full bg-m3-primary transition-all"></div></div>
-        <div class="text-[11px] text-m3-onSurfaceVariant mt-2 text-right">Mínimo: <span id="item-min"></span></div>
-      </div>
-
-      <!-- Tarjeta Proyección (Predictiva) -->
-      <div id="item-proj-card" class="bg-m3-surfaceContainer rounded-3xl p-5 mb-4 hidden">
-        <div class="flex items-center justify-between mb-4">
-          <div>
-            <div id="proj-title" class="text-sm font-medium text-m3-onSurface"></div>
-            <div id="proj-subtitle" class="text-[11px] text-m3-onSurfaceVariant mt-0.5"></div>
+      <!-- Contenedor Principal de Vistas -->
+      <main id="main-content" class="flex-1 overflow-y-auto overflow-x-hidden relative no-scrollbar pb-6 px-4 md:px-8">
+        
+        <!-- Tab 1: Inicio -->
+        <section id="tab-home" class="w-full h-full flex flex-col py-2 transition-transform max-w-6xl mx-auto">
+          <div class="bg-m3-surfaceContainerLow rounded-3xl p-5 md:p-8 mb-6 border-t-4 border-m3-primary shadow-sm md:flex md:items-center md:justify-between">
+            <div class="md:w-1/2">
+              <div class="flex items-center justify-between md:justify-start md:gap-4 mb-4">
+                <span class="text-xs font-medium text-m3-onSurfaceVariant uppercase tracking-wider">Stock Global</span>
+                <span id="home-user" class="inline-flex items-center gap-1 bg-m3-surfaceContainerHigh px-2 py-1 rounded-full text-xs font-medium"><span class="material-symbols-rounded text-[14px]">person</span>Usuario</span>
+              </div>
+              <div id="home-total-stock" class="text-5xl md:text-7xl font-light text-m3-onSurface font-mono tracking-tight mb-4 md:mb-0">0</div>
+            </div>
+            <div class="grid grid-cols-3 gap-3 md:gap-6 md:w-1/2">
+              <div class="bg-m3-surfaceContainer px-3 py-2 md:p-4 rounded-2xl md:rounded-3xl">
+                <div id="home-kpi-ok" class="text-xl md:text-3xl font-medium text-m3-success font-mono">0</div><div class="text-[10px] md:text-xs text-m3-onSurfaceVariant uppercase mt-1">Óptimos</div>
+              </div>
+              <div class="bg-m3-surfaceContainer px-3 py-2 md:p-4 rounded-2xl md:rounded-3xl">
+                <div id="home-kpi-low" class="text-xl md:text-3xl font-medium text-m3-warning font-mono">0</div><div class="text-[10px] md:text-xs text-m3-onSurfaceVariant uppercase mt-1">Bajos</div>
+              </div>
+              <div class="bg-m3-surfaceContainer px-3 py-2 md:p-4 rounded-2xl md:rounded-3xl">
+                <div id="home-kpi-crit" class="text-xl md:text-3xl font-medium text-m3-error font-mono">0</div><div class="text-[10px] md:text-xs text-m3-onSurfaceVariant uppercase mt-1">Críticos</div>
+              </div>
+            </div>
           </div>
-          <span class="material-symbols-rounded text-m3-primary bg-m3-primaryContainer p-1.5 rounded-full text-[16px]">timeline</span>
-        </div>
-        <div class="grid grid-cols-3 gap-2 text-center">
-          <div><div id="proj-days" class="text-xl font-mono text-m3-onSurface"></div><div class="text-[10px] text-m3-onSurfaceVariant">Días Rest.</div></div>
-          <div><div id="proj-use" class="text-xl font-mono text-m3-onSurface"></div><div class="text-[10px] text-m3-onSurfaceVariant">Uso Diario</div></div>
-          <div><div id="proj-date" class="text-xl font-mono text-m3-onSurface"></div><div class="text-[10px] text-m3-onSurfaceVariant">Fecha Est.</div></div>
-        </div>
+          <div class="text-sm font-medium text-m3-onSurfaceVariant tracking-wider uppercase mb-3 px-1">Categorías</div>
+          <!-- Grid Responsivo -->
+          <div id="home-categories" class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3 md:gap-4"></div>
+        </section>
+
+        <!-- Tab 2: Búsqueda -->
+        <section id="tab-search" class="w-full h-full hidden flex-col py-2 max-w-4xl mx-auto">
+          <div class="bg-m3-surfaceContainerHigh h-14 rounded-full flex items-center px-4 gap-3 mb-4 shrink-0">
+            <span class="material-symbols-rounded text-m3-onSurfaceVariant">search</span>
+            <input id="inp-search" type="text" placeholder="Buscar producto..." class="flex-1 bg-transparent outline-none text-m3-onSurface text-base">
+            <button id="btn-clear-search" class="hidden text-m3-onSurfaceVariant"><span class="material-symbols-rounded text-xl">close</span></button>
+          </div>
+          <!-- La búsqueda en desktop se mostrará en 2 o 3 columnas -->
+          <div id="search-results" class="flex flex-col md:grid md:grid-cols-2 lg:grid-cols-3 md:gap-4"></div>
+        </section>
+
+        <!-- Tab 3: Alertas -->
+        <section id="tab-alerts" class="w-full h-full hidden flex-col py-2 max-w-5xl mx-auto">
+          <div id="alerts-list" class="flex flex-col md:grid md:grid-cols-2 lg:grid-cols-3 md:gap-4"></div>
+        </section>
+
+        <!-- Tab 4: Historial -->
+        <section id="tab-history" class="w-full h-full hidden flex-col py-2 max-w-4xl mx-auto">
+          <div id="history-list" class="flex flex-col md:bg-m3-surfaceContainerLow md:rounded-3xl md:p-4"></div>
+        </section>
+
+        <!-- Tab 5: Reporte -->
+        <section id="tab-report" class="w-full h-full hidden flex-col py-2 max-w-md mx-auto">
+          <div class="bg-m3-surfaceContainer rounded-3xl p-6 md:p-10 mb-4 text-center">
+            <div class="w-16 h-16 bg-m3-primaryContainer text-m3-primary rounded-full flex items-center justify-center mx-auto mb-4">
+              <span class="material-symbols-rounded text-3xl">picture_as_pdf</span>
+            </div>
+            <h2 class="text-xl md:text-2xl font-display font-medium mb-2">Exportar Inventario</h2>
+            <p class="text-sm text-m3-onSurfaceVariant mb-8">Genera un reporte consolidado con proyecciones y estado actual.</p>
+            <button onclick="app.generatePDF()" class="w-full h-12 bg-m3-primary text-m3-onPrimary rounded-full font-medium shadow-sm active:scale-95 transition-transform flex items-center justify-center gap-2">
+              <span class="material-symbols-rounded">download</span> Descargar PDF
+            </button>
+            <button onclick="window.open(SHEET_URL, '_blank')" class="w-full h-12 bg-transparent text-m3-primary rounded-full font-medium mt-4 active:bg-m3-primaryContainer/30 transition-colors">
+              Abrir Base de Datos
+            </button>
+          </div>
+        </section>
+
+      </main>
+
+      <!-- ==================== OVERLAYS (Limitados al área derecha en Desktop) ==================== -->
+      
+      <!-- Overlay: Categoría / Subcategorías -->
+      <div id="view-category" class="absolute inset-0 z-30 bg-m3-surface w-full flex flex-col overlay-enter hidden">
+        <header class="h-16 flex items-center px-4 md:px-8 shrink-0 bg-m3-surface border-b border-m3-surfaceVariant md:border-m3-surfaceVariant/50">
+          <button onclick="app.closeOverlay('category')" class="w-10 h-10 -ml-2 rounded-full flex items-center justify-center hover:bg-m3-surfaceContainer active:bg-m3-surfaceVariant text-m3-onSurfaceVariant transition-colors">
+            <span class="material-symbols-rounded">arrow_back</span>
+          </button>
+          <div class="flex-1 min-w-0 ml-2">
+            <h1 id="cat-title" class="text-lg md:text-xl font-display font-medium text-m3-onSurface truncate">Categoría</h1>
+            <p id="cat-subtitle" class="text-xs text-m3-onSurfaceVariant truncate"></p>
+          </div>
+        </header>
+        <main class="flex-1 overflow-y-auto no-scrollbar"><div id="cat-list" class="flex flex-col py-4 px-4 md:px-8 gap-3 max-w-4xl mx-auto w-full md:grid md:grid-cols-2 lg:grid-cols-3"></div></main>
       </div>
 
-      <!-- Botones Acción -->
-      <div id="item-actions" class="grid grid-cols-3 gap-3 mb-6">
-        <button onclick="app.openAdjust('in')" class="h-20 bg-m3-successContainer text-m3-onSuccessContainer rounded-2xl flex flex-col items-center justify-center gap-1 active:scale-95 transition-transform">
-          <span class="material-symbols-rounded">add</span><span class="text-sm font-medium">Ingreso</span>
-        </button>
-        <button onclick="app.openAdjust('out')" class="h-20 bg-m3-errorContainer text-m3-onErrorContainer rounded-2xl flex flex-col items-center justify-center gap-1 active:scale-95 transition-transform">
-          <span class="material-symbols-rounded">remove</span><span class="text-sm font-medium">Salida</span>
-        </button>
-        <button onclick="app.openAdjust('set')" class="h-20 bg-m3-secondaryContainer text-m3-onSecondaryContainer rounded-2xl flex flex-col items-center justify-center gap-1 active:scale-95 transition-transform">
-          <span class="material-symbols-rounded">edit</span><span class="text-sm font-medium">Ajustar</span>
-        </button>
+      <!-- Overlay: Lista de Productos -->
+      <div id="view-subcat" class="absolute inset-0 z-40 bg-m3-surface w-full flex flex-col overlay-enter hidden">
+        <header class="h-16 flex items-center px-4 md:px-8 shrink-0 bg-m3-surface border-b border-m3-surfaceVariant md:border-m3-surfaceVariant/50">
+          <button onclick="app.closeOverlay('subcat')" class="w-10 h-10 -ml-2 rounded-full flex items-center justify-center hover:bg-m3-surfaceContainer active:bg-m3-surfaceVariant text-m3-onSurfaceVariant transition-colors">
+            <span class="material-symbols-rounded">arrow_back</span>
+          </button>
+          <div class="flex-1 min-w-0 ml-2">
+            <h1 id="subcat-title" class="text-lg md:text-xl font-display font-medium text-m3-onSurface truncate">Productos</h1>
+            <p id="subcat-subtitle" class="text-xs text-m3-onSurfaceVariant truncate"></p>
+          </div>
+        </header>
+        <main class="flex-1 overflow-y-auto no-scrollbar"><div id="subcat-list" class="flex flex-col md:grid md:grid-cols-2 lg:grid-cols-3 gap-2 md:gap-4 py-4 px-4 md:px-8 max-w-6xl mx-auto w-full"></div></main>
       </div>
 
-      <!-- Form Ajuste -->
-      <div id="item-adjust-form" class="bg-m3-surfaceContainer rounded-3xl p-5 hidden flex-col mb-6">
-        <h3 id="adj-title" class="text-base font-medium mb-4 text-m3-onSurface">Ajuste</h3>
-        <div class="bg-m3-surfaceContainerHighest rounded-t-xl border-b-2 border-m3-primary px-4 pt-2 pb-1 mb-3">
-          <label class="text-[10px] text-m3-onSurfaceVariant font-medium">Cantidad</label>
-          <input id="inp-adj-val" type="number" inputmode="numeric" class="w-full bg-transparent outline-none text-3xl font-mono text-m3-onSurface">
-        </div>
-        <div class="bg-m3-surfaceContainerHighest rounded-t-xl border-b-2 border-m3-outline px-4 pt-2 pb-2 mb-5">
-          <label class="text-[10px] text-m3-onSurfaceVariant font-medium">Nota opcional</label>
-          <input id="inp-adj-note" type="text" class="w-full bg-transparent outline-none text-sm text-m3-onSurface mt-1">
-        </div>
-        <div class="flex justify-end gap-2">
-          <button onclick="app.closeAdjust()" class="px-4 py-2 text-m3-primary font-medium rounded-full hover:bg-m3-primaryContainer/50 text-sm">Cancelar</button>
-          <button onclick="app.confirmAdjust()" class="px-5 py-2 bg-m3-primary text-m3-onPrimary font-medium rounded-full active:opacity-80 text-sm">Confirmar</button>
-        </div>
+      <!-- Overlay: Detalle de Item -->
+      <div id="view-item" class="absolute inset-0 z-50 bg-m3-surface w-full flex flex-col overlay-enter hidden">
+        <header class="h-16 flex items-center px-4 md:px-8 shrink-0 bg-m3-surface border-b border-m3-surfaceVariant/0 md:border-m3-surfaceVariant/50">
+          <button onclick="app.closeOverlay('item')" class="w-10 h-10 -ml-2 rounded-full flex items-center justify-center hover:bg-m3-surfaceContainer active:bg-m3-surfaceVariant text-m3-onSurfaceVariant transition-colors">
+            <span class="material-symbols-rounded">arrow_back</span>
+          </button>
+          <div class="flex-1 min-w-0 ml-2">
+            <h1 id="item-title" class="text-lg md:text-xl font-display font-medium text-m3-onSurface truncate leading-tight">Nombre</h1>
+            <p id="item-subtitle" class="text-xs text-m3-onSurfaceVariant truncate leading-tight mt-[1px]">Categoría</p>
+          </div>
+        </header>
+        <main class="flex-1 overflow-y-auto no-scrollbar px-4 md:px-8 pb-8 flex flex-col items-center">
+          
+          <!-- Contenedor centralizado para Escritorio -->
+          <div class="w-full max-w-3xl">
+            <!-- Tarjeta Stock -->
+            <div class="bg-m3-surfaceContainerLow rounded-3xl p-6 md:p-8 text-center border-t-4 border-m3-primary mb-4 md:mb-6 mt-2 md:mt-6 shadow-sm">
+              <div class="text-xs font-medium text-m3-onSurfaceVariant tracking-widest uppercase mb-1">Stock Actual</div>
+              <div id="item-stock" class="text-6xl md:text-8xl font-light text-m3-primary font-mono tracking-tight mb-2">0</div>
+              <div id="item-unit" class="text-m3-onSurfaceVariant text-sm mb-4 md:mb-6">unidades</div>
+              <div id="item-status-chip" class="inline-flex items-center gap-1.5 px-4 md:px-6 py-1.5 md:py-2 rounded-full text-sm md:text-base font-medium"></div>
+              <div class="mt-6 md:mt-8 bg-m3-surfaceContainerHigh h-2 rounded-full overflow-hidden"><div id="item-progress" class="h-full bg-m3-primary transition-all"></div></div>
+              <div class="text-[11px] text-m3-onSurfaceVariant mt-2 text-right">Mínimo: <span id="item-min"></span></div>
+            </div>
+
+            <div class="md:grid md:grid-cols-2 md:gap-6">
+              <!-- Columna 1 (Desktop): Proyección & Botones -->
+              <div>
+                <!-- Tarjeta Proyección -->
+                <div id="item-proj-card" class="bg-m3-surfaceContainer rounded-3xl p-5 md:p-6 mb-4 hidden">
+                  <div class="flex items-center justify-between mb-4">
+                    <div>
+                      <div id="proj-title" class="text-sm md:text-base font-medium text-m3-onSurface"></div>
+                      <div id="proj-subtitle" class="text-[11px] text-m3-onSurfaceVariant mt-0.5"></div>
+                    </div>
+                    <span class="material-symbols-rounded text-m3-primary bg-m3-primaryContainer p-1.5 rounded-full text-[16px] md:text-[20px]">timeline</span>
+                  </div>
+                  <div class="grid grid-cols-3 gap-2 text-center">
+                    <div><div id="proj-days" class="text-xl md:text-2xl font-mono text-m3-onSurface"></div><div class="text-[10px] md:text-[11px] text-m3-onSurfaceVariant mt-1">Días Rest.</div></div>
+                    <div><div id="proj-use" class="text-xl md:text-2xl font-mono text-m3-onSurface"></div><div class="text-[10px] md:text-[11px] text-m3-onSurfaceVariant mt-1">Uso Diario</div></div>
+                    <div><div id="proj-date" class="text-xl md:text-2xl font-mono text-m3-onSurface"></div><div class="text-[10px] md:text-[11px] text-m3-onSurfaceVariant mt-1">Fecha Est.</div></div>
+                  </div>
+                </div>
+
+                <!-- Botones Acción -->
+                <div id="item-actions" class="grid grid-cols-3 gap-3 mb-6">
+                  <button onclick="app.openAdjust('in')" class="h-20 bg-m3-successContainer text-m3-onSuccessContainer rounded-2xl flex flex-col items-center justify-center gap-1 active:scale-95 hover:brightness-95 transition-all">
+                    <span class="material-symbols-rounded">add</span><span class="text-sm font-medium">Ingreso</span>
+                  </button>
+                  <button onclick="app.openAdjust('out')" class="h-20 bg-m3-errorContainer text-m3-onErrorContainer rounded-2xl flex flex-col items-center justify-center gap-1 active:scale-95 hover:brightness-95 transition-all">
+                    <span class="material-symbols-rounded">remove</span><span class="text-sm font-medium">Salida</span>
+                  </button>
+                  <button onclick="app.openAdjust('set')" class="h-20 bg-m3-secondaryContainer text-m3-onSecondaryContainer rounded-2xl flex flex-col items-center justify-center gap-1 active:scale-95 hover:brightness-95 transition-all">
+                    <span class="material-symbols-rounded">edit</span><span class="text-sm font-medium">Ajustar</span>
+                  </button>
+                </div>
+
+                <!-- Form Ajuste -->
+                <div id="item-adjust-form" class="bg-m3-surfaceContainer rounded-3xl p-5 md:p-6 hidden flex-col mb-6">
+                  <h3 id="adj-title" class="text-base font-medium mb-4 text-m3-onSurface">Ajuste</h3>
+                  <div class="bg-m3-surfaceContainerHighest rounded-t-xl border-b-2 border-m3-primary px-4 pt-2 pb-1 mb-3">
+                    <label class="text-[10px] text-m3-onSurfaceVariant font-medium">Cantidad</label>
+                    <input id="inp-adj-val" type="number" inputmode="numeric" class="w-full bg-transparent outline-none text-3xl font-mono text-m3-onSurface">
+                  </div>
+                  <div class="bg-m3-surfaceContainerHighest rounded-t-xl border-b-2 border-m3-outline px-4 pt-2 pb-2 mb-5">
+                    <label class="text-[10px] text-m3-onSurfaceVariant font-medium">Nota opcional</label>
+                    <input id="inp-adj-note" type="text" class="w-full bg-transparent outline-none text-sm text-m3-onSurface mt-1">
+                  </div>
+                  <div class="flex justify-end gap-2">
+                    <button onclick="app.closeAdjust()" class="px-4 py-2 text-m3-primary font-medium rounded-full hover:bg-m3-primaryContainer/50 text-sm transition-colors">Cancelar</button>
+                    <button onclick="app.confirmAdjust()" class="px-5 py-2 bg-m3-primary text-m3-onPrimary font-medium rounded-full active:opacity-80 hover:shadow-md text-sm transition-all">Confirmar</button>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Columna 2 (Desktop): Historial -->
+              <div>
+                <div class="text-sm font-medium text-m3-onSurfaceVariant uppercase tracking-wider mb-3 md:mt-0">Historial Reciente</div>
+                <div id="item-history-list" class="flex flex-col md:bg-m3-surfaceContainerLow md:rounded-3xl md:p-4"></div>
+              </div>
+            </div>
+          </div>
+        </main>
       </div>
 
-      <div class="text-sm font-medium text-m3-onSurfaceVariant uppercase tracking-wider mb-3">Historial Reciente</div>
-      <div id="item-history-list" class="flex flex-col"></div>
-    </main>
+    </div> <!-- Fin Área Derecha -->
   </div>
 
   <!-- ==================== SNACKBAR (Toast M3) ==================== -->
-  <div id="snackbar" class="fixed bottom-24 left-1/2 -translate-x-1/2 bg-[#313033] text-[#F4EFF4] px-4 py-3 rounded-xl shadow-lg flex items-center gap-3 text-sm z-[60] opacity-0 pointer-events-none min-w-[300px]">
+  <div id="snackbar" class="fixed bottom-[100px] md:bottom-10 left-1/2 -translate-x-1/2 bg-[#313033] text-[#F4EFF4] px-4 py-3 rounded-xl shadow-lg flex items-center gap-3 text-sm z-[60] opacity-0 pointer-events-none min-w-[300px]">
     <span id="sb-icon" class="material-symbols-rounded text-m3-successContainer">check_circle</span>
     <span id="sb-text" class="flex-1">Mensaje</span>
   </div>
@@ -340,7 +364,6 @@
     let API_URL = "https://script.google.com/macros/s/AKfycbyEc51AIkfpgZzzfv_qHWfkQUObG824eNsg8sCZL0KU8r9k0lhVbx4EKYP1Ktq7Knk_gg/exec";
     const SHEET_URL = "https://docs.google.com/spreadsheets/d/1eF4MZHXzz_UQOvNbni-g0ljoD1fJIeg_QsHG8H6ievo/edit";
     
-    // Fallback Items Local para Offline
     const FALLBACK_ITEMS = [{"id":"e1","cat":"Etiquetas Adhesivas","subcat":"1Kg Funsmart","name":"Espresso Original","stock":600,"min":100,"unit":"uds","alert":""},{"id":"e2","cat":"Etiquetas Adhesivas","subcat":"1Kg Funsmart","name":"Espresso Frutal","stock":142,"min":150,"unit":"uds","alert":"Pedir pronto"},{"id":"b1","cat":"Bolsas","subcat":"MTPACK Impresas","name":"MTPACK Impresas 250g","stock":75,"min":500,"unit":"uds","alert":""},{"id":"c1","cat":"Cajas","subcat":"Kawas Grandes","name":"Caja Kawas SYT 12KG","stock":1850,"min":500,"unit":"uds","alert":""}];
     const CC_KNOWN = {
       "Etiquetas Adhesivas": {i:'label',c:'text-[#0061A4]',b:'bg-[#0061A4]/10'},
@@ -361,7 +384,6 @@
     const st = (x) => { if(x.stock<=0)return"zero"; if(x.min>0&&x.stock<x.min*0.3)return"crit"; if(x.min>0&&x.stock<x.min)return"low"; return"ok"; };
     const escapeHTML = (s) => String(s).replace(/[&<>'"]/g, t => ({'&':'&amp;','<':'&lt;','>':'&gt;',"'":'&#39;','"':'&quot;'}[t]));
     
-    // Predictor presenvado exactamente
     function calcProjection(item){
       var pad=function(n){return("0"+n).slice(-2)};
       if(item.stock<=0) return {icon:"error",title:"Sin stock",subtitle:"No hay unidades disponibles",days:"0",dailyUse:"-",dateOut:"-",color:"text-m3-error"};
@@ -411,7 +433,6 @@
       return {title:daysLeft<=0?"Sin stock":daysLeft<=7?"Agotamiento inminente":daysLeft<=21?"Stock limitado":"Stock holgado",subtitle:sub,days:String(daysLeft),dailyUse:dailyUse<1?dailyUse.toFixed(1):Math.round(dailyUse).toString(),dateOut:pad(futureDate.getDate())+"/"+pad(futureDate.getMonth()+1),color:dc};
     }
 
-    // --- ARQUITECTURA PRINCIPAL PWA ---
     const app = {
       state: {
         users: [], items: [], hist: [], user: null, tab: 'home', 
@@ -429,7 +450,6 @@
           const d = JSON.parse(localStorage.getItem('kawas_pro_data'));
           if (d && d.items) { this.state.items = d.items; this.state.hist = d.hist || []; }
           else { this.state.items = JSON.parse(JSON.stringify(FALLBACK_ITEMS)); }
-          
           const u = JSON.parse(localStorage.getItem('kawas_pro_users'));
           if (u) this.state.users = u;
         } catch(e) { this.state.items = FALLBACK_ITEMS; }
@@ -438,7 +458,6 @@
         localStorage.setItem('kawas_pro_data', JSON.stringify({items: this.state.items, hist: this.state.hist}));
       },
 
-      // Capa de Red Exacta
       async fetchAPI(action, opts = {}) {
         const url = new URL(API_URL); url.searchParams.append('action', action);
         const res = await fetch(url.toString(), { redirect: 'follow' });
@@ -499,7 +518,6 @@
         searchInp.addEventListener('input', (e) => { this.state.q = e.target.value.toLowerCase(); this.renderSearch(); });
         document.getElementById('btn-clear-search').addEventListener('click', () => { searchInp.value = ''; searchInp.dispatchEvent(new Event('input')); });
 
-        // Swipe horizontal real
         let tX = 0;
         document.getElementById('main-content').addEventListener('touchstart', e => tX = e.changedTouches[0].screenX, {passive: true});
         document.getElementById('main-content').addEventListener('touchend', e => {
@@ -526,7 +544,7 @@
           setTimeout(() => {
             document.getElementById('view-login').classList.add('hidden');
             document.getElementById('app-shell').classList.remove('hidden');
-            this.sync(); // Force real sync on enter
+            this.sync(); 
             this.renderAll();
           }, 300);
         } else {
@@ -551,17 +569,17 @@
         if(tId === 'search') setTimeout(() => document.getElementById('inp-search').focus(), 100);
       },
 
-      // --- GENERADORES M3 ---
       getCatUI(cat) { return CC_KNOWN[cat] || {i:'category', c:'text-m3-primary', b:'bg-m3-primaryContainer'}; },
       
-      createListItem(it, idx) {
+      createListItem(it, idx, isGrid = false) {
         const ui = STC[st(it)];
         const sub = it.subcat ? ` • ${escapeHTML(it.subcat)}` : '';
         const pct = it.min > 0 ? Math.min(100, Math.round((it.stock/it.min)*100)) : 100;
         const barColor = st(it)==='ok'?'bg-m3-success':st(it)==='low'?'bg-m3-warning':'bg-m3-error';
+        // En vistas grid (desktop) la tarjeta se adapta perfecto
         return `
-          <div onclick="app.openOverlay('item', '${it.id}')" class="bg-m3-surfaceContainerLow rounded-2xl p-4 active:scale-95 transition-transform cursor-pointer shadow-sm stagger-item" style="animation-delay: ${idx * 0.03}s">
-            <div class="flex items-start justify-between gap-2 mb-2">
+          <div onclick="app.openOverlay('item', '${it.id}')" class="bg-m3-surfaceContainerLow rounded-2xl p-4 active:scale-95 transition-transform cursor-pointer shadow-sm stagger-item flex flex-col justify-between" style="animation-delay: ${idx * 0.03}s">
+            <div class="flex items-start justify-between gap-2 mb-3">
               <div class="flex-1 min-w-0">
                 <h3 class="text-base font-medium text-m3-onSurface leading-tight truncate">${escapeHTML(it.name)}</h3>
                 <p class="text-[11px] text-m3-onSurfaceVariant truncate mt-0.5">${escapeHTML(it.cat)}${sub}</p>
@@ -571,7 +589,7 @@
                 <div class="text-[10px] text-m3-onSurfaceVariant">${escapeHTML(it.unit)}</div>
               </div>
             </div>
-            <div class="flex items-center gap-2">
+            <div class="flex items-center gap-2 mt-auto">
               <span class="inline-flex items-center gap-1 ${ui.b} ${ui.c} px-2 py-0.5 rounded-full text-[10px] font-medium"><span class="material-symbols-rounded text-[12px]">${ui.i}</span>${ui.l}</span>
               <div class="flex-1 h-1 bg-m3-surfaceContainerHighest rounded-full overflow-hidden"><div class="h-full ${barColor}" style="width: ${pct}%"></div></div>
             </div>
@@ -584,7 +602,7 @@
         const icon = isAdd ? 'add' : (isSub ? 'remove' : 'edit');
         const color = isAdd ? 'text-m3-success bg-m3-successContainer' : (isSub ? 'text-m3-error bg-m3-errorContainer' : 'text-m3-warning bg-m3-warningContainer');
         return `
-          <div class="flex items-center gap-3 py-3 px-1 border-b border-m3-surfaceVariant last:border-0 stagger-item" style="animation-delay: ${idx * 0.01}s">
+          <div class="flex items-center gap-3 py-3 px-2 border-b border-m3-surfaceVariant last:border-0 stagger-item" style="animation-delay: ${idx * 0.01}s">
             <div class="w-10 h-10 rounded-full flex items-center justify-center shrink-0 ${color}"><span class="material-symbols-rounded text-[20px]">${icon}</span></div>
             <div class="flex-1 min-w-0">
               <h3 class="text-sm font-medium text-m3-onSurface truncate">${escapeHTML(h.nm)}</h3>
@@ -623,10 +641,10 @@
           const ui = this.getCatUI(cat); const c = cats[cat];
           const badge = c.issues > 0 ? `<div class="absolute top-3 right-3 w-5 h-5 bg-m3-error text-m3-onError flex items-center justify-center rounded-full text-[10px] font-bold">${c.issues}</div>` : '';
           return `
-            <div onclick="app.openOverlay('category', '${escapeHTML(cat)}')" class="bg-m3-surfaceContainerHighest rounded-3xl p-4 relative active:scale-95 transition-transform cursor-pointer stagger-item" style="animation-delay: ${i * 0.04}s">
-              <div class="${ui.c} ${ui.b} w-12 h-12 rounded-full flex items-center justify-center mb-3"><span class="material-symbols-rounded text-[24px]">${ui.i}</span></div>
-              <h3 class="font-medium text-m3-onSurface text-[14px] leading-tight mb-0.5">${escapeHTML(cat)}</h3>
-              <p class="text-[11px] text-m3-onSurfaceVariant">${c.count} items</p>
+            <div onclick="app.openOverlay('category', '${escapeHTML(cat)}')" class="bg-m3-surfaceContainerHighest rounded-3xl p-4 md:p-5 relative active:scale-95 hover:shadow-md transition-all cursor-pointer stagger-item" style="animation-delay: ${i * 0.04}s">
+              <div class="${ui.c} ${ui.b} w-12 h-12 md:w-14 md:h-14 rounded-full flex items-center justify-center mb-3"><span class="material-symbols-rounded text-[24px] md:text-[28px]">${ui.i}</span></div>
+              <h3 class="font-medium text-m3-onSurface text-[14px] md:text-[16px] leading-tight mb-0.5 md:mb-1">${escapeHTML(cat)}</h3>
+              <p class="text-[11px] md:text-[12px] text-m3-onSurfaceVariant">${c.count} items</p>
               ${badge}
             </div>
           `;
@@ -639,7 +657,7 @@
         document.getElementById('btn-clear-search').classList.toggle('hidden', this.state.q === '');
         if(!this.state.q) { box.innerHTML = ''; return; }
         const res = this.state.items.filter(it => it.name.toLowerCase().includes(this.state.q));
-        box.innerHTML = `<div class="flex flex-col gap-2">${res.map((it, i) => this.createListItem(it, i)).join('')}</div>`;
+        box.innerHTML = res.map((it, i) => this.createListItem(it, i)).join('');
       },
 
       renderAlerts() {
@@ -648,8 +666,8 @@
         document.getElementById('badge-alerts').classList.toggle('hidden', cCount === 0);
         
         if(this.state.tab !== 'alerts') return;
-        if(!alerts.length) { document.getElementById('alerts-list').innerHTML = `<div class="text-center py-10 text-m3-onSurfaceVariant"><span class="material-symbols-rounded text-6xl opacity-50 mb-4">check_circle</span><p>Todo el stock está en niveles óptimos.</p></div>`; return; }
-        document.getElementById('alerts-list').innerHTML = `<div class="flex flex-col gap-2">${alerts.map((it, i) => this.createListItem(it, i)).join('')}</div>`;
+        if(!alerts.length) { document.getElementById('alerts-list').innerHTML = `<div class="text-center py-10 text-m3-onSurfaceVariant col-span-full"><span class="material-symbols-rounded text-6xl opacity-50 mb-4">check_circle</span><p>Todo el stock está en niveles óptimos.</p></div>`; return; }
+        document.getElementById('alerts-list').innerHTML = alerts.map((it, i) => this.createListItem(it, i)).join('');
       },
 
       renderHistory() {
@@ -657,7 +675,6 @@
         document.getElementById('history-list').innerHTML = this.state.hist.slice(0, 50).map((h, i) => this.createHistoryItem(h, i)).join('');
       },
 
-      // --- GESTIÓN DE OVERLAYS (Navegación Profunda) ---
       openOverlay(type, id) {
         if (type === 'category') {
           this.state.selCat = id;
@@ -666,15 +683,15 @@
           const subs = {}; this.state.items.filter(x => x.cat === id).forEach(x => { const s = x.subcat||'General'; if(!subs[s])subs[s]=[]; subs[s].push(x); });
           const sk = Object.keys(subs);
           
-          if(sk.length === 1 && sk[0] === 'General') { this.openOverlay('subcat', 'General'); return; } // Skip to items if no subcats
+          if(sk.length === 1 && sk[0] === 'General') { this.openOverlay('subcat', 'General'); return; } 
           
           document.getElementById('cat-subtitle').textContent = `${sk.length} subcategorías`;
           document.getElementById('cat-list').innerHTML = sk.map((s, i) => {
             const count = subs[s].length; const issues = subs[s].filter(x => st(x)!=='ok').length;
             const b = issues ? `<span class="bg-m3-errorContainer text-m3-onErrorContainer px-2 py-0.5 rounded-full text-[10px] font-bold">${issues} alertas</span>` : `<span class="bg-m3-successContainer text-m3-onSuccessContainer px-2 py-0.5 rounded-full text-[10px] font-bold">OK</span>`;
             return `
-              <div onclick="app.openOverlay('subcat', '${escapeHTML(s)}')" class="bg-m3-surfaceContainerHighest rounded-2xl p-4 flex items-center justify-between cursor-pointer active:scale-95 transition-transform stagger-item" style="animation-delay: ${i*0.03}s">
-                <div><h3 class="font-medium text-m3-onSurface text-base">${escapeHTML(s)}</h3><p class="text-xs text-m3-onSurfaceVariant">${count} productos</p></div>${b}
+              <div onclick="app.openOverlay('subcat', '${escapeHTML(s)}')" class="bg-m3-surfaceContainerHighest rounded-2xl p-4 md:p-6 flex items-center justify-between cursor-pointer active:scale-95 hover:shadow-md transition-all stagger-item" style="animation-delay: ${i*0.03}s">
+                <div><h3 class="font-medium text-m3-onSurface text-base md:text-lg">${escapeHTML(s)}</h3><p class="text-xs text-m3-onSurfaceVariant">${count} productos</p></div>${b}
               </div>
             `;
           }).join('');
@@ -685,7 +702,7 @@
           document.getElementById('subcat-title').textContent = id;
           document.getElementById('subcat-subtitle').textContent = this.state.selCat;
           const its = this.state.items.filter(x => x.cat === this.state.selCat && (x.subcat||'General') === id).sort((a,b) => STC[st(a)].v - STC[st(b)].v);
-          document.getElementById('subcat-list').innerHTML = `<div class="flex flex-col gap-2 px-4 pb-4">${its.map((it, i) => this.createListItem(it, i)).join('')}</div>`;
+          document.getElementById('subcat-list').innerHTML = its.map((it, i) => this.createListItem(it, i, true)).join('');
           this.showView('view-subcat');
         }
         else if (type === 'item') {
@@ -698,7 +715,7 @@
           document.getElementById('item-min').textContent = `${it.min} ${it.unit}`;
           
           const ui = STC[st(it)];
-          document.getElementById('item-status-chip').className = `inline-flex items-center gap-1.5 px-4 py-1.5 rounded-full text-sm font-medium ${ui.b} ${ui.c}`;
+          document.getElementById('item-status-chip').className = `inline-flex items-center gap-1.5 px-4 md:px-6 py-1.5 md:py-2 rounded-full text-sm md:text-base font-medium ${ui.b} ${ui.c}`;
           document.getElementById('item-status-chip').innerHTML = `<span class="material-symbols-rounded text-base">${ui.i}</span> ${ui.l}`;
           document.getElementById('item-progress').style.width = `${it.min>0?Math.min(100, Math.round(it.stock/it.min*100)):100}%`;
           document.getElementById('item-progress').className = `h-full transition-all ${st(it)==='ok'?'bg-m3-success':st(it)==='low'?'bg-m3-warning':'bg-m3-error'}`;
@@ -708,7 +725,7 @@
           if(p) {
             pCard.classList.remove('hidden');
             document.getElementById('proj-title').textContent = p.title; document.getElementById('proj-subtitle').textContent = p.subtitle;
-            document.getElementById('proj-days').textContent = p.days; document.getElementById('proj-days').className = `text-xl font-mono ${p.color}`;
+            document.getElementById('proj-days').textContent = p.days; document.getElementById('proj-days').className = `text-xl md:text-2xl font-mono ${p.color}`;
             document.getElementById('proj-use').textContent = p.dailyUse; document.getElementById('proj-date').textContent = p.dateOut;
           } else { pCard.classList.add('hidden'); }
 
@@ -729,7 +746,6 @@
       },
       showView(id) { const v = document.getElementById(id); v.classList.remove('hidden'); v.classList.add('overlay-enter-active'); },
 
-      // --- AJUSTE DE INVENTARIO ---
       openAdjust(mode) {
         this.state.adjMode = mode;
         document.getElementById('item-actions').classList.add('hidden');
@@ -764,7 +780,6 @@
         } catch(e) { this.toast("Error de Red. Sincronizar luego.", "error"); }
       },
 
-      // --- PDF Y TOAST ---
       toast(msg, type="ok") {
         const sb = document.getElementById('snackbar'); document.getElementById('sb-text').textContent = msg;
         const icon = document.getElementById('sb-icon'); icon.textContent = type==='error'?'error':'check_circle';
